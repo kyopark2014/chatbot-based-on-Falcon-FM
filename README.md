@@ -46,8 +46,6 @@ if(statusCode==200):
             outputText = outputText + resp['generated_text'] + '\n'
 ```
 
-결과는 아래와 같습니다.
-
 참고로 Falcon의 Response 예는 아래와 같습니다.
 
 ```json
