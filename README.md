@@ -1,4 +1,4 @@
-# Falcon FM을 이용한 Chat API 생성
+# Falcon FM을 이용한 Chatbot 만들기
 
 여기서는 [Falcon Foundation Model](https://aws.amazon.com/ko/blogs/machine-learning/technology-innovation-institute-trains-the-state-of-the-art-falcon-llm-40b-foundation-model-on-amazon-sagemaker/)을 [Amazon SageMaker JumpStart](https://aws.amazon.com/ko/sagemaker/jumpstart/?sagemaker-data-wrangler-whats-new.sort-by=item.additionalFields.postDateTime&sagemaker-data-wrangler-whats-new.sort-order=desc)을 이용하여 설치하고 웹브라우저 기반의 Chatbot을 생성하는 방법에 대해 설명합니다. 이때의 Architecture는 아래와 같습니다.
 
