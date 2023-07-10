@@ -2,7 +2,7 @@
 
 ## Falcon FM 설치하기
 
-[Falcon Foundation Model 설치](./deploy-falcon-fm.md)에 따라 Amazon SageMaker의 JumpStart의 Falcon FM 모델을 설치합니다.
+[Falcon Foundation Model 설치](./deploy-falcon-fm.md)에 따라 Amazon SageMaker의 JumpStart의 Falcon FM을 설치합니다.
 
 ## 인프라 설치하기
 
