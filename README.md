@@ -103,7 +103,7 @@ if(statusCode==200):
 
 1) "Building a website can be done in 10 simple steps"에 대한 답변
 
-![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/deca3b03-9652-420d-ab67-34a5d8046ed9)
+![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/9b129b87-e21d-42b2-8de3-78632c62767b)
 
 
 2) "Guide me how to travel from New York to LA."에 대한 답변
