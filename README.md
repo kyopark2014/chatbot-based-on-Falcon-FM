@@ -2,16 +2,11 @@
 
 여기서는 [Falcon Foundation Model](https://aws.amazon.com/ko/blogs/machine-learning/technology-innovation-institute-trains-the-state-of-the-art-falcon-llm-40b-foundation-model-on-amazon-sagemaker/)을 [Amazon SageMaker JumpStart](https://aws.amazon.com/ko/sagemaker/jumpstart/?sagemaker-data-wrangler-whats-new.sort-by=item.additionalFields.postDateTime&sagemaker-data-wrangler-whats-new.sort-order=desc)을 이용하여 설치하고 웹브라우저 기반의 Chatbot을 생성하는 방법에 대해 설명합니다. 이때의 Architecture는 아래와 같습니다.
 
-사용자는 CloudFront를 통해 채팅 웹페이지에 접속합니다. 이때 사용자가 텍스트를 입력하면 API Gateway를 통해 Lambda로 전달되면, SageMaker Endpoint를 통해 채팅에 대한 요청을 처리합니다. 이때 SageMaker Endpoint는 Falcon Foundation Model의 응답을 전달합니다. 이때 Falcon Foundation Model은 SageMaker JumpStart를 통해 설치하고, Chatbot를 위한 API는 AWS CDK를 이용하여 설치합니다. 
+사용자는 CloudFront를 통해 채팅 웹페이지에 접속합니다. 이때 사용자가 텍스트를 입력하면 API Gateway를 통해 Lambda로 전달되면, SageMaker Endpoint를 통해 채팅에 대한 요청을 처리합니다. 이때 SageMaker Endpoint는 Falcon Foundation Model의 응답을 전달합니다. 이때 Falcon Foundation Model은 SageMaker JumpStart를 통해 설치하고, Chatbot를 위한 API는 AWS CDK를 이용하여 설치합니다. 생성된 chatbot은 "/chat" API를 통하여 텍스트로 요청을 하고 응답을 화면에 표시할 수 있습니다.
 
 <img src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/13c45617-9b47-4d8d-a68d-a344e0cb8bc3" width="700">
 
-생성된 chatbot은 "/chat" API를 통하여 텍스트로 요청을 하고 응답을 화면에 표시할 수 있습니다.
 
-<img src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/88e1a7de-8aaf-40a2-b1b2-b4bcfd5d4ded" width="600">
-
-
-![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/311ed6e6-4648-4839-a902-19e0ba1bbfe4)
 
 ## 구현하기
 
