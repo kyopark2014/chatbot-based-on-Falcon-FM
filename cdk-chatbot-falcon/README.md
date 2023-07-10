@@ -22,16 +22,16 @@ const lambdaChatApi = new lambda.Function(this, 'lambda-chat', {
 Lambda의 퍼미션은 아래와 같이 SageMaker와 API Gateway를 invoke할수 있도록 설정합니다.
 
 ```python
-const SageMakerPolicy = new iam.PolicyStatement({  // policy statement for sagemaker
+const SageMakerPolicy = new iam.PolicyStatement({  
     actions: ['sagemaker:*'],
     resources: ['*'],
 });
-lambdaChatApi.role?.attachInlinePolicy( // add sagemaker policy
+lambdaChatApi.role?.attachInlinePolicy(
     new iam.Policy(this, 'sagemaker-policy', {
         statements: [SageMakerPolicy],
     }),
 );
-lambdaChatApi.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  // permission for api Gateway
+lambdaChatApi.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  
 ```
 
 
