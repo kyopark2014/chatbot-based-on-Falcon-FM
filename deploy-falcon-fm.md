@@ -8,6 +8,6 @@
 
 ![noname](https://github.com/kyopark2014/ML-langchain/assets/52392004/39611d38-93b0-4ffe-b8ff-7c87da59b25a)
 
-3) Deploy가 다 끝나면, 아래와 같이 Endpoint를 확인합니다. 여기서 생성된 Endpoint의 이름은 "
+3) Deploy가 다 끝나면, 아래와 같이 Endpoint를 확인합니다. 여기서 생성된 Endpoint의 이름은 "jumpstart-dft-hf-llm-falcon-7b-instruct-bf16"입니다.
 
 ![image](https://github.com/kyopark2014/ML-langchain/assets/52392004/74539eeb-91fc-4858-9f1d-49f85045511d)
