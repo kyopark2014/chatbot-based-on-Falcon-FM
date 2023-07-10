@@ -127,6 +127,8 @@ function addReceivedMessage(msg) {
     var timestr = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
     index++;
 
+    msg = msg.replaceAll("\n", "<br/>");
+
     // msglist[index].innerHTML =  `<div class="chat-receiver chat-receiver--left"><h1>${sender}</h1><h2>${timestr}</h2>${msg}&nbsp;</div>`;     
     msglist[index].innerHTML = `<div class="chat-receiver chat-receiver--left"><h1>${sender}</h1>${msg}&nbsp;</div>`;  
 
