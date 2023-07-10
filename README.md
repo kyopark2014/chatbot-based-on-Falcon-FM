@@ -91,5 +91,24 @@ if(statusCode==200):
 
 [AWS CDK를 이용한 인프라 설치하기](./cdk-chatbot-falcon/README.md)에 따라 인프라를 설치하고 WEB URL로 접속합니다.
 
+### 실행 결과
+
+1) "Building a website can be done in 10 simple steps"에 대한 답변
+
+![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/deca3b03-9652-420d-ab67-34a5d8046ed9)
 
 
+2) "Guide me how to travel from New York to LA."에 대한 답변
+
+![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/433d895f-5153-4745-9f68-90e02cb32f15)
+
+
+### 인프라 정리하기
+
+Cloud9에 접속하여 아래와 같이 삭제를 합니다.
+
+```java
+cdk destroy
+```
+
+Falcone FM 모델의 inference를 위해 GPU를 포함한 "ml.g5.2xlarge"를 사용하고 있으므로, 더이상 사용하지 않을 경우에 반드시 삭제하여야 합니다. 이를 위해 [Inference Console](https://ap-northeast-2.console.aws.amazon.com/sagemaker/home?region=ap-northeast-2#/endpoints)에 접속해서 Endpoint를 삭제합니다. 마찬가지로 [Model console](https://ap-northeast-2.console.aws.amazon.com/sagemaker/home?region=ap-northeast-2#/models)과 [Endpoint configuration](https://ap-northeast-2.console.aws.amazon.com/sagemaker/home?region=ap-northeast-2#/endpointConfig)에서 설치한 Falcone을 삭제합니다. 
