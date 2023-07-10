@@ -1,34 +1,112 @@
-# CDK를 이용한 인프라 설치하기
+# CDK를 이용한 인프라 구현
 
-여기서는 [Cloud9](https://aws.amazon.com/ko/cloud9/)에서 [AWS CDK](https://aws.amazon.com/ko/cdk/)를 이용하여 인프라를 설치합니다.
+[cdk-chatbot-falcon-stack.ts](./lib/cdk-chatbot-falcon-stack.ts)에 대해 설명합니다.
 
-1) [Cloud9 Console](https://ap-northeast-2.console.aws.amazon.com/cloud9control/home?region=ap-northeast-2#/create)에 접속하여 [Create environment]-[Name]에서 “chatbot”으로 이름을 입력하고, EC2 instance는 “m5.large”를 선택합니다. 나머지는 기본값을 유지하고, 하단으로 스크롤하여 [Create]를 선택합니다.
+chatbot을 구현하는 lambda를 python3.9로 아래와 같이 구현합니다. 이때 endpoint는 이전에 Falcon FM 모델후 생성된 endpoint 이름을 입력합니다.
 
-![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/7c20d80c-52fc-4d18-b673-bd85e2660850)
-
-2) [Environment](https://ap-northeast-2.console.aws.amazon.com/cloud9control/home?region=ap-northeast-2#/)에서 “chatbot”를 [Open]한 후에 아래와 같이 터미널을 실행합니다.
-
-![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/b7d0c3c0-3e94-4126-b28d-d269d2635239)
-
-3) 소스를 다운로드합니다.
-
-```java
-git clone https://github.com/kyopark2014/chatbot-based-on-Falcon-FM
+```python
+const lambdaChatApi = new lambda.Function(this, 'lambda-chat', {
+    description: 'lambda for chat api',
+    functionName: 'lambda-chat-api',
+    handler: 'lambda_function.lambda_handler',
+    runtime: lambda.Runtime.PYTHON_3_9,
+    code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-chat')),
+    timeout: cdk.Duration.seconds(120),
+    logRetention: logs.RetentionDays.ONE_DAY,
+    environment: {
+        endpoint: endpoint,
+    }
+});
 ```
 
-4) cdk 폴더로 이동하여 필요한 라이브러리를 설치합니다.
+Lambda의 퍼미션은 아래와 같이 SageMaker와 API Gateway를 invoke할수 있도록 설정합니다.
 
-```java
-cd chatbot-based-on-Falcon-FM/cdk-chatbot-falcon/ && npm install
+```python
+const SageMakerPolicy = new iam.PolicyStatement({  // policy statement for sagemaker
+    actions: ['sagemaker:*'],
+    resources: ['*'],
+});
+lambdaChatApi.role?.attachInlinePolicy( // add sagemaker policy
+    new iam.Policy(this, 'sagemaker-policy', {
+        statements: [SageMakerPolicy],
+    }),
+);
+lambdaChatApi.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  // permission for api Gateway
 ```
 
-5) 인프라를 설치합니다.
 
-```java
-cdk deploy
+API Gateway에 대한 권한 및 POST 방식의 '/chat' API를 생성합니다.
+
+```python
+// role
+const role = new iam.Role(this, "api-role-chatbot", {
+    roleName: "api-role-chatbot",
+    assumedBy: new iam.ServicePrincipal("apigateway.amazonaws.com")
+});
+role.addToPolicy(new iam.PolicyStatement({
+    resources: ['*'],
+    actions: ['lambda:InvokeFunction']
+}));
+role.addManagedPolicy({
+    managedPolicyArn: 'arn:aws:iam::aws:policy/AWSLambdaExecute',
+});
+
+// API Gateway
+const api = new apiGateway.RestApi(this, 'api-chatbot', {
+    description: 'API Gateway for chatbot',
+    endpointTypes: [apiGateway.EndpointType.REGIONAL],
+    deployOptions: {
+        stageName: stage,
+
+        // logging for debug
+        loggingLevel: apiGateway.MethodLoggingLevel.INFO,
+        dataTraceEnabled: true,
+    },
+});
+
+// POST method
+const chat = api.root.addResource('chat');
+chat.addMethod('POST', new apiGateway.LambdaIntegration(lambdaChatApi, {
+    passthroughBehavior: apiGateway.PassthroughBehavior.WHEN_NO_TEMPLATES,
+    credentialsRole: role,
+    integrationResponses: [{
+        statusCode: '200',
+    }],
+    proxy: false,
+}), {
+    methodResponses: [   // API Gateway sends to the client that called a method.
+        {
+            statusCode: '200',
+            responseModels: {
+                'application/json': apiGateway.Model.EMPTY_MODEL,
+            },
+        }
+    ]
+});
 ```
 
-6) 설치가 완료되면 브라우저에서 아래와 같이 WebUrl을 확인합니다. 
 
-![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/dfc27dcd-3d46-4471-bcaf-04f0f709b4d3)
+CloudFront는 아래와 같이 설정합니다.
 
+```python
+const distribution = new cloudFront.Distribution(this, 'cloudfront', {
+    defaultBehavior: {
+        origin: new origins.S3Origin(s3Bucket),
+        allowedMethods: cloudFront.AllowedMethods.ALLOW_ALL,
+        cachePolicy: cloudFront.CachePolicy.CACHING_DISABLED,
+        viewerProtocolPolicy: cloudFront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    },
+    priceClass: cloudFront.PriceClass.PRICE_CLASS_200,
+});
+new cdk.CfnOutput(this, 'distributionDomainName', {
+    value: distribution.domainName,
+    description: 'The domain name of the Distribution',
+});
+
+
+distribution.addBehavior("/chat", new origins.RestApiOrigin(api), {
+    cachePolicy: cloudFront.CachePolicy.CACHING_DISABLED,
+    allowedMethods: cloudFront.AllowedMethods.ALLOW_ALL,
+    viewerProtocolPolicy: cloudFront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+});
+```
