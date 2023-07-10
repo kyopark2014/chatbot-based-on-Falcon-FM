@@ -1,4 +1,4 @@
-# Amazon SageMaker JumpStart로 Falcon Foundation Model 설치하기
+# Amazon SageMaker JumpStart로 Falcon FM 설치하기
 
 여기에서는 Amazon SageMaker JumpStart를 이용하여 Falcon Foundation Model을 설치합니다. 편의상 인프라 설치와 관련된 설명은 서울 리전(Region)을 기준으로 구성합니다.
 
