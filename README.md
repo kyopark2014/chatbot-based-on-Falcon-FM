@@ -12,14 +12,30 @@
 
 ![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/b7d0c3c0-3e94-4126-b28d-d269d2635239)
 
-4) 
+4) 소스를 다운로드합니다.
 
-5) 
+```java
+git clone https://github.com/kyopark2014/chatbot-based-on-Falcon-FM
+```
+
+5) cdk 폴더로 이동하여 필요한 라이브러리를 설치합니다.
+
+```java
+cd chatbot-based-on-Falcon-FM/cdk-chatbot-falcon/ && npm install
+```
+
+6) 인프라를 설치합니다.
+
+```java
+cdk deploy
+```
+
+7) 설치가 완료되면 브라우저에서 아래와 같이 WebUrl을 확인합니다. 
+
+![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/dfc27dcd-3d46-4471-bcaf-04f0f709b4d3)
 
 
 
-
-6) 소스 다운로드
 
 
 결과는 아래와 같습니다.
