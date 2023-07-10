@@ -40,20 +40,9 @@ if(statusCode==200):
             outputText = outputText + resp['generated_text'] + '\n'
 ```
 
-
-## Falcon FM 설치하기
-
-[Falcon Foundation Model 설치](./deploy-falcon-fm.md)에 따라 Amazon SageMaker의 JumpStart의 Falcon FM을 설치합니다.
-
-## 인프라 설치하기
-
-[AWS CDK를 이용한 인프라 설치하기](./cdk-chatbot-falcon/README.md)에 따라 인프라를 설치하고 WEB URL로 접속합니다.
-
-
-
 결과는 아래와 같습니다.
 
-Response의 예는 아래와 같습니다.
+참고로 Falcon의 Response 예는 아래와 같습니다.
 
 ```json
 {
@@ -85,3 +74,18 @@ Response의 예는 아래와 같습니다.
    }
 ]
 ```
+
+
+
+## 직접 실습하여 보기
+
+### Falcon FM 설치하기
+
+[Falcon Foundation Model 설치](./deploy-falcon-fm.md)에 따라 Amazon SageMaker의 JumpStart의 Falcon FM을 설치합니다.
+
+### 인프라 설치하기
+
+[AWS CDK를 이용한 인프라 설치하기](./cdk-chatbot-falcon/README.md)에 따라 인프라를 설치하고 WEB URL로 접속합니다.
+
+
+
