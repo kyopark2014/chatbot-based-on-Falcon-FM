@@ -1,4 +1,4 @@
-# Falcon Foundation Model을 이용한 Chatbot
+# Falcon Foundation Model 설치
 
 ## Falcon FM을 이용한 Chat API 생성
 
