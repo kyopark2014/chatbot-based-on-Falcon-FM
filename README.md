@@ -1,5 +1,46 @@
 # Falcon FM을 이용한 Chat API 생성
 
+
+## 입력받기
+
+API Gateway를 통해 들어온 텍스트 입력으로 payload를 생성합니다.
+
+```python
+text = event['text']
+
+payload = {
+    "inputs": text,
+    "parameters":{
+        "max_new_tokens": 200,
+    }
+}
+```
+
+아래와 같이 boto3를 이용해 endpoint로 payload를 전달합니다. 이때 출력의 statusCode가 200일때 body의 generated_text를 추출합니다.
+
+```python
+client = boto3.client('runtime.sagemaker')
+
+endpoint_name = os.environ.get('endpoint')
+response = client.invoke_endpoint(
+    EndpointName=endpoint_name, 
+    ContentType='application/json', 
+    Body=json.dumps(payload).encode('utf-8'))                
+        
+statusCode = response['ResponseMetadata']['HTTPStatusCode']        
+
+outputText = ""        
+if(statusCode==200):
+    response_payload = json.loads(response['Body'].read())
+
+    if len(response_payload) == 1:
+        outputText = response_payload[0]['generated_text']
+    else:
+        for resp in response_payload:
+            outputText = outputText + resp['generated_text'] + '\n'
+```
+
+
 ## Falcon FM 설치하기
 
 [Falcon Foundation Model 설치](./deploy-falcon-fm.md)에 따라 Amazon SageMaker의 JumpStart의 Falcon FM을 설치합니다.
