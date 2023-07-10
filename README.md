@@ -10,6 +10,9 @@
 
 <img src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/88e1a7de-8aaf-40a2-b1b2-b4bcfd5d4ded" width="600">
 
+
+![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/311ed6e6-4648-4839-a902-19e0ba1bbfe4)
+
 ## 구현하기
 
 ### Chatbot API 
