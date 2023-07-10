@@ -4,7 +4,8 @@
 
 사용자는 CloudFront를 통해 채팅 웹페이지에 접속합니다. 이때 사용자가 텍스트를 입력하면 Lambda를 통해 SageMaker Endpoint로 요청이 전달됩니다. 이때 Falcon Foundation Model이 응답하면 이를 다시 브라우저에 표시합니다. 이때 Falcon Foundation Model은 SageMaker JumpStart를 통해 설치하고, AWS CDK를 통해 관련된 인프라를 설치합니다. 
 
-![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/13c45617-9b47-4d8d-a68d-a344e0cb8bc3)
+<img src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/13c45617-9b47-4d8d-a68d-a344e0cb8bc3" width="600">
+
 
 ## Chatbot 구현하기
 
