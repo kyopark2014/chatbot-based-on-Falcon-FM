@@ -22,12 +22,19 @@ git clone https://github.com/kyopark2014/chatbot-based-on-Falcon-FM
 cd chatbot-based-on-Falcon-FM/cdk-chatbot-falcon/ && npm install
 ```
 
-5) 인프라를 설치합니다.
+5) Endpoint주소를 업데이트 합니다.
+
+Endpoint 주소는 [Falcon FM 생성](./deploy-falcon-fm.md)에서 얻은 Endpoint의 이름입니다. 아래와 같이 "chatbot-based-on-Falcon-FM/cdk-chatbot-falcon/lib/cdk-chatbot-falcon-stack.ts"를 열어서 "endpoint"의 값을 업데이트 합니다.
+
+![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/960b8003-423f-43af-94b2-788a4c655a52)
+
+
+6) 인프라를 설치합니다.
 
 ```java
 cdk deploy
 ```
 
-6) 설치가 완료되면 브라우저에서 아래와 같이 WebUrl을 확인합니다. 
+7) 설치가 완료되면 브라우저에서 아래와 같이 WebUrl을 확인합니다. 
 
 ![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/dfc27dcd-3d46-4471-bcaf-04f0f709b4d3)
