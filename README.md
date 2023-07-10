@@ -1,6 +1,6 @@
 # Falcon FM을 이용한 Chat API 생성
 
-## Falcon FM 모델 설치하기
+## Falcon FM 설치하기
 
 [Falcon Foundation Model 설치](./deploy-falcon-fm.md)에 따라 Amazon SageMaker의 JumpStart의 Falcon FM 모델을 설치합니다.
 
