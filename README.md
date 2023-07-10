@@ -1,12 +1,25 @@
-# Falcon Foundation Model 설치
+# Falcon FM을 이용한 Chat API 생성
 
-## Falcon FM을 이용한 Chat API 생성
+## 인프라 설치하기
+
+1) [Falcon Foundation Model 설치](./deploy-falcon-fm.md)에 따라 Amazon SageMaker의 JumpStart의 Falcon FM 모델을 설치합니다.
+
+2) Cloud9 Console에 접속하여 [Create environment] 이름으로 “chatbot”를 입력하고, EC2 instance는 편의상 “m5.large”를 선택합니다. 나머지는 기본값을 유지하고, 하단으로 스크롤하여 [Create]를 선택합니다.
+
+![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/7c20d80c-52fc-4d18-b673-bd85e2660850)
+
+3) [Environment](https://ap-northeast-2.console.aws.amazon.com/cloud9control/home?region=ap-northeast-2#/)에서 “chatbot”를 [Open]한 후에 아래와 같이 터미널을 실행합니다.
+
+![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/b7d0c3c0-3e94-4126-b28d-d269d2635239)
+
+4) 
+
+5) 
 
 
-[Falcon Foundation Model 설치](./deploy-falcon-fm.md)에 따라 Amazon SageMaker의 JumpStart의 Falcon FM 모델을 설치합니다.
 
 
-3) 소스 다운로드
+6) 소스 다운로드
 
 
 결과는 아래와 같습니다.
