@@ -108,7 +108,7 @@ if(statusCode==200):
 
 2) "Guide me how to travel from New York to LA."에 대한 답변
 
-![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/433d895f-5153-4745-9f68-90e02cb32f15)
+![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/2b7d414c-adf0-4694-86a2-40be2483fa50)
 
 
 ### 인프라 정리하기
