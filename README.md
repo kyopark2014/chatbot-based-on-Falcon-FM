@@ -7,7 +7,9 @@
 <img src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/13c45617-9b47-4d8d-a68d-a344e0cb8bc3" width="700">
 
 
-## Chatbot 구현하기
+## 구현하기
+
+### Chatbot API 
 
 사용자가 입력한 text는 CloudFront - API Gateway를 통해 Lambda로 전달됩니다. 이때 전달된 텍스트 입력을 event에서 분리한 후에 payload를 생성합니다. 상세한 내용은 [lambda_function.py
 ](./lambda-chat/lambda_function.py)을 참조합니다.
@@ -80,21 +82,24 @@ if(statusCode==200):
 ]
 ```
 
+### 인프라 구현
+
+[CDK를 이용한 인프라 구현](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/blob/main/cdk-chatbot-falcon/README.md)은 CDK로 인프라를 구현하는 코드를 구성하는 방법에 대해 설명하고 있습니다.
 
 
-## 직접 실습하여 보기
+## 직접 실습하기
 
-### Falcon FM 설치하기
+### Falcon FM 설치
 
 [Falcon Foundation Model 설치](./deploy-falcon-fm.md)에 따라 Amazon SageMaker의 JumpStart의 Falcon FM을 설치합니다.
 
-### 인프라 설치하기
+### 인프라 설치
 
 [AWS CDK를 이용한 인프라 설치하기](./cdk-deployment.md)에 따라 인프라를 설치하고 WEB URL로 접속합니다.
 
 
 
-### 실행 결과
+### 실행 결과 확인
 
 1) "Building a website can be done in 10 simple steps"에 대한 답변
 
