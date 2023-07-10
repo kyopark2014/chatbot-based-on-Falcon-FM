@@ -8,8 +8,7 @@
 
 생성된 chatbot은 "/chat" API를 통하여 텍스트로 요청을 하고 응답을 화면에 표시할 수 있습니다.
 
-![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/88e1a7de-8aaf-40a2-b1b2-b4bcfd5d4ded)
-
+<img src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/88e1a7de-8aaf-40a2-b1b2-b4bcfd5d4ded" width="600">
 
 ## 구현하기
 
