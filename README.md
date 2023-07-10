@@ -90,7 +90,9 @@ if(statusCode==200):
 
 ### 인프라 설치하기
 
-[AWS CDK를 이용한 인프라 설치하기](./cdk-chatbot-falcon/README.md)에 따라 인프라를 설치하고 WEB URL로 접속합니다.
+[AWS CDK를 이용한 인프라 설치하기](./cdk-deployment.md)에 따라 인프라를 설치하고 WEB URL로 접속합니다.
+
+
 
 ### 실행 결과
 
