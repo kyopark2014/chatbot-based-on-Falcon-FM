@@ -29,7 +29,7 @@ exports.handler = async (event, context) => {
     
     let filename = "";
     const uuid = uuidv4();   
-    filename = uuid+'.jpeg';
+    filename = uuid+'.pdf';
     console.log('filename = '+filename);
     
     try {

@@ -130,6 +130,7 @@ export class CdkChatbotFalconStack extends cdk.Stack {
     const api = new apiGateway.RestApi(this, 'api-chatbot', {
       description: 'API Gateway for chatbot',
       endpointTypes: [apiGateway.EndpointType.REGIONAL],
+      binaryMediaTypes: ['application/pdf'], 
       deployOptions: {
         stageName: stage,
 
