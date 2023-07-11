@@ -16,3 +16,7 @@ print(page.extract_text(0))
 print(page.extract_text((0, 90)))
 ```
 
+
+## Reference 
+
+[How to read PDF from S3 on Lambda trigger](https://medium.com/srcecde/how-to-read-pdf-from-s3-on-lambda-trigger-b9e27c488deb)
