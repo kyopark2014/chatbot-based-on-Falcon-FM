@@ -13,6 +13,7 @@ import * as s3Deploy from "aws-cdk-lib/aws-s3-deployment";
 const debug = false;
 const stage = 'dev';
 const endpoint = 'jumpstart-dft-hf-llm-falcon-7b-instruct-bf16';
+const s3_prefix = 'docs';
 
 export class CdkChatbotFalconStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -100,7 +101,7 @@ export class CdkChatbotFalconStack extends cdk.Stack {
       environment: {
         endpoint: endpoint,
         s3_bucket: s3Bucket.bucketName,
-        s3_prefix: 'docs'
+        s3_prefix: s3_prefix
       }
     });
 
@@ -167,8 +168,35 @@ export class CdkChatbotFalconStack extends cdk.Stack {
       description: 'Curl commend of API Gateway',
     }); 
 
+    // POST method - pdf summary
+    const pdf = api.root.addResource('pdf');
+    pdf.addMethod('POST', new apiGateway.LambdaIntegration(lambdaPdfApi, {
+      passthroughBehavior: apiGateway.PassthroughBehavior.WHEN_NO_TEMPLATES,
+      credentialsRole: role,
+      integrationResponses: [{
+        statusCode: '200',
+      }], 
+      proxy:false, 
+    }), {
+      methodResponses: [   // API Gateway sends to the client that called a method.
+        {
+          statusCode: '200',
+          responseModels: {
+            'application/json': apiGateway.Model.EMPTY_MODEL,
+          }, 
+        }
+      ]
+    }); 
+
     // cloudfront setting for api gateway of stable diffusion
     distribution.addBehavior("/chat", new origins.RestApiOrigin(api), {
+      cachePolicy: cloudFront.CachePolicy.CACHING_DISABLED,
+      allowedMethods: cloudFront.AllowedMethods.ALLOW_ALL,  
+      viewerProtocolPolicy: cloudFront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    });    
+
+    // cloudfront setting for api gateway of stable diffusion
+    distribution.addBehavior("/pdf", new origins.RestApiOrigin(api), {
       cachePolicy: cloudFront.CachePolicy.CACHING_DISABLED,
       allowedMethods: cloudFront.AllowedMethods.ALLOW_ALL,  
       viewerProtocolPolicy: cloudFront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
@@ -193,7 +221,8 @@ export class CdkChatbotFalconStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(10),
       logRetention: logs.RetentionDays.ONE_DAY,
       environment: {
-        bucketName: s3Bucket.bucketName
+        bucketName: s3Bucket.bucketName,
+        s3_prefix:  s3_prefix
       }      
     });
     s3Bucket.grantReadWrite(lambdaUpload);

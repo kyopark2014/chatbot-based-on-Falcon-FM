@@ -1,17 +1,17 @@
 const aws = require('aws-sdk');
-const cd = require('content-disposition');
 const {v4: uuidv4} = require('uuid');
 
 const s3 = new aws.S3({ apiVersion: '2006-03-01' });
 
 const bucketName = process.env.bucketName;
+const s3_prefix = process.env.s3_prefix;
 
 exports.handler = async (event, context) => {
     //console.log('## ENVIRONMENT VARIABLES: ' + JSON.stringify(process.env));
     //console.log('## EVENT: ' + JSON.stringify(event))
     
     const body = Buffer.from(event["body"], "base64");
-    console.log('body: ' + body)
+    console.log('body: ' + body);
     const header = event['multiValueHeaders'];
     console.log('header: ' + JSON.stringify(header));
             
@@ -28,20 +28,14 @@ exports.handler = async (event, context) => {
     console.log('disposition = '+contentDisposition);
     
     let filename = "";
-    const uuid = uuidv4();
-    
-    if(contentDisposition) {
-        filename = cd.parse(contentDisposition).parameters.filename;
-    }
-    else { 
-        filename = uuid+'.jpeg';
-    }
+    const uuid = uuidv4();   
+    filename = uuid+'.jpeg';
     console.log('filename = '+filename);
     
     try {
         const destparams = {
             Bucket: bucketName, 
-            Key: filename,
+            Key: s3_prefix+'/'+filename,
             Body: body,
             ContentType: contentType
         };
@@ -62,21 +56,6 @@ exports.handler = async (event, context) => {
     }; 
     console.log('file info: ' + JSON.stringify(fileInfo));
     
-    try {
-        let params = {
-            DelaySeconds: 10,
-            MessageAttributes: {},
-            MessageBody: JSON.stringify(fileInfo), 
-            QueueUrl: sqsRekognitionUrl
-        };         
-        console.log('params: '+JSON.stringify(params));
-
-        let result = await sqs.sendMessage(params).promise();  
-        console.log("result="+JSON.stringify(result));
-    } catch (err) {
-        console.log(err);
-    } 
-
     const response = {
         statusCode: 200,
         body: JSON.stringify(fileInfo)

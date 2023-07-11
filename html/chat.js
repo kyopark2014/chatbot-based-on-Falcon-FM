@@ -149,10 +149,46 @@ refreshChatWindow.addEventListener('click', function(){
 
 attachFile.addEventListener('click', function(){
     console.log('click: attachFile');
-    // var input = $(document.createElement('input')); 
-    // input.attr("type", "file");
-    // input.trigger('click');
-    // return false;
+
+    let input = $(document.createElement('input')); 
+    input.attr("type", "file");
+    input.trigger('click');    
+    
+    $(document).ready(function() {
+        input.change(function(evt) {
+            // alert($(this).val());
+
+            // let x = $(this).val();
+            // console.log('x: ' + x);
+            // let filename = x.replace(/^.*[\\\/]/, '')
+            // console.log('filename: '+filename);
+
+            const url = './upload';
+            let formData = new FormData();
+            formData.append("attachFile" , $(this));
+            
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open("POST", url, true);                 
+            xmlHttp.setRequestHeader('Content-Type', 'application/pdf');
+            //xmlHttp.setRequestHeader('Content-Disposition', 'form-data; name="'+name+'"; filename="'+filename+'"');
+            
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200 ) {
+                    console.log(xmlHttp.responseText);
+
+                    response = JSON.parse(xmlHttp.responseText);
+                    console.log('upload file nmae: ' + response.Key);
+
+                    sendRequestPDF(response.Key);
+                }
+            };
+            
+            xmlHttp.send(formData); 
+            console.log(xmlHttp.responseText);             
+        });
+    });
+       
+    return false;
 });
 
 function sendRequest(text) {
@@ -170,6 +206,28 @@ function sendRequest(text) {
     };
 
     var requestObj = {"text":text}
+    console.log("request: " + JSON.stringify(requestObj));
+
+    var blob = new Blob([JSON.stringify(requestObj)], {type: 'application/json'});
+
+    xhr.send(blob);            
+}
+
+function sendRequestPDF(object) {
+    const uri = "pdf";
+    const xhr = new XMLHttpRequest();
+
+    xhr.open("POST", uri, true);
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            response = JSON.parse(xhr.responseText);
+            console.log("response: " + JSON.stringify(response));
+            
+            addReceivedMessage(response.msg)
+        }
+    };
+
+    var requestObj = {"object":object}
     console.log("request: " + JSON.stringify(requestObj));
 
     var blob = new Blob([JSON.stringify(requestObj)], {type: 'application/json'});
