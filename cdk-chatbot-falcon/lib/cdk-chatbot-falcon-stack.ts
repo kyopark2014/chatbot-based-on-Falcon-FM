@@ -82,11 +82,35 @@ export class CdkChatbotFalconStack extends cdk.Stack {
       resources: ['*'],
     });
     lambdaChatApi.role?.attachInlinePolicy( // add sagemaker policy
-      new iam.Policy(this, 'sagemaker-policy', {
+      new iam.Policy(this, 'sagemaker-policy-lambda-chat', {
         statements: [SageMakerPolicy],
       }),
     );
-    lambdaChatApi.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  // permission for api Gateway
+    lambdaChatApi.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  
+
+    // Lambda for pdf
+    const lambdaPdfApi = new lambda.Function(this, 'lambda-pdf', {
+      description: 'lambda for pdf api',
+      functionName: 'lambda-pdf-api',
+      handler: 'lambda_function.lambda_handler',
+      runtime: lambda.Runtime.PYTHON_3_9,
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-pdf')),
+      timeout: cdk.Duration.seconds(120),
+      logRetention: logs.RetentionDays.ONE_DAY,
+      environment: {
+        endpoint: endpoint,
+        s3_bucket: s3Bucket.bucketName,
+        s3_prefix: 'docs'
+      }
+    });
+
+    lambdaPdfApi.role?.attachInlinePolicy( // add sagemaker policy
+      new iam.Policy(this, 'sagemaker-policy-for-lambda-pdf', {
+        statements: [SageMakerPolicy],
+      }),
+    );    
+    s3Bucket.grantRead(lambdaPdfApi); // permission for s3
+    lambdaPdfApi.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com')); 
 
     // role
     const role = new iam.Role(this, "api-role-chatbot", {
@@ -159,5 +183,51 @@ export class CdkChatbotFalconStack extends cdk.Stack {
       value: 'aws s3 cp ../html/chat.js '+'s3://'+s3Bucket.bucketName,
       description: 'The url of web file upload',
     });
+
+    // Lambda - Upload
+    const lambdaUpload = new lambda.Function(this, "LambdaUpload", {
+      runtime: lambda.Runtime.NODEJS_16_X, 
+      functionName: "lambda-upload",
+      code: lambda.Code.fromAsset("../lambda-upload"), 
+      handler: "index.handler", 
+      timeout: cdk.Duration.seconds(10),
+      logRetention: logs.RetentionDays.ONE_DAY,
+      environment: {
+        bucketName: s3Bucket.bucketName
+      }      
+    });
+    s3Bucket.grantReadWrite(lambdaUpload);
+
+    // POST method - upload
+    const resourceName = "upload";
+    const upload = api.root.addResource(resourceName);
+    upload.addMethod('POST', new apiGateway.LambdaIntegration(lambdaUpload, {
+      passthroughBehavior: apiGateway.PassthroughBehavior.WHEN_NO_TEMPLATES,
+      credentialsRole: role,
+      integrationResponses: [{
+        statusCode: '200',
+      }], 
+      proxy:true, 
+    }), {
+      methodResponses: [  
+        {
+          statusCode: '200',
+          responseModels: {
+            'application/json': apiGateway.Model.EMPTY_MODEL,
+          }, 
+        }
+      ]
+    }); 
+    new cdk.CfnOutput(this, 'ApiGatewayUrl', {
+      value: api.url+'upload',
+      description: 'The url of API Gateway',
+    }); 
+
+    // cloudfront setting for api gateway    
+    distribution.addBehavior("/upload", new origins.RestApiOrigin(api), {
+      cachePolicy: cloudFront.CachePolicy.CACHING_DISABLED,
+      allowedMethods: cloudFront.AllowedMethods.ALLOW_ALL,  
+      viewerProtocolPolicy: cloudFront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    });    
   }
 }

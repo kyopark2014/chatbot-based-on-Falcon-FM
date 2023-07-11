@@ -1,12 +1,9 @@
 import json
 import boto3
-import io
 import os
 import time
-import base64
 from multiprocessing import Process
-
-s3 = boto3.client('s3')
+from io import BytesIO
 
 def query_endpoint(payload, endpoint_name):
     client = boto3.client('runtime.sagemaker')
@@ -44,9 +41,10 @@ def lambda_handler(event, context):
     print(event)
 
     text = event['text']
+    print('text: ', text)
 
     start = int(time.time())
-
+    
     payload = {
         "inputs": text,
         "parameters":{
@@ -56,14 +54,14 @@ def lambda_handler(event, context):
             #"top_k":10
         }
     }
-    
+        
     endpoint_name = os.environ.get('endpoint')
     response = query_endpoint(payload, endpoint_name)
 
     generated_text = response['body']
     statusCode = response['statusCode']
 
-    newline, bold, unbold = '\n', '\033[1m', '\033[0m'
+    newline, bold, unbold = '\n', '\033[1m', '\033[0m' 
     print (
         f"Input Text: {payload['inputs']}{newline}"
         f"Generated Text: {bold}{generated_text}{unbold}{newline}")
@@ -74,5 +72,4 @@ def lambda_handler(event, context):
     return {
         'statusCode': statusCode,
         'msg': generated_text,
-    }
-
+    }        
