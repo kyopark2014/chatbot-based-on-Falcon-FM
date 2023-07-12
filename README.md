@@ -1,16 +1,14 @@
 # Falcon Foundation Model을 이용한 Chatbot 만들기
 
-[2023년 6월부터 AWS 서울 리전에서 EC2 G5를 사용](https://aws.amazon.com/ko/about-aws/whats-new/2023/06/amazon-ec2-g5-instances-additional-regions/)할 수 있게 되었습니다. 여기서는 [Falcon Foundation Model](https://aws.amazon.com/ko/blogs/machine-learning/technology-innovation-institute-trains-the-state-of-the-art-falcon-llm-40b-foundation-model-on-amazon-sagemaker/)을 [Amazon SageMaker JumpStart](https://aws.amazon.com/ko/sagemaker/jumpstart/?sagemaker-data-wrangler-whats-new.sort-by=item.additionalFields.postDateTime&sagemaker-data-wrangler-whats-new.sort-order=desc)를 이용해 AWS 서울 리전의 EC2 G5에 설치하고, 웹브라우저 기반의 Chatbot을 생성하는 방법에 대해 설명합니다. Falcon FM은 SageMaker JumpStart를 통해 설치하고, Chatbot를 위한 API는 [AWS CDK](https://aws.amazon.com/ko/cdk/)를 이용하여 설치합니다. 생성된 chatbot은 REST API를 통하여 텍스트로 요청을 하고 응답을 화면에 표시할 수 있습니다. 상세한 Architecture는 아래와 같습니다. 
+[2023년 6월부터 AWS 서울 리전에서 EC2 G5를 사용](https://aws.amazon.com/ko/about-aws/whats-new/2023/06/amazon-ec2-g5-instances-additional-regions/)할 수 있게 되었습니다. 여기서는 [Falcon Foundation Model](https://aws.amazon.com/ko/blogs/machine-learning/technology-innovation-institute-trains-the-state-of-the-art-falcon-llm-40b-foundation-model-on-amazon-sagemaker/)을 [Amazon SageMaker JumpStart](https://aws.amazon.com/ko/sagemaker/jumpstart/?sagemaker-data-wrangler-whats-new.sort-by=item.additionalFields.postDateTime&sagemaker-data-wrangler-whats-new.sort-order=desc)를 이용해 AWS 서울 리전의 EC2 G5에 설치하고, 웹브라우저 기반의 Chatbot을 생성하는 방법에 대해 설명합니다. Falcon FM은 SageMaker JumpStart를 통해 Endpoint를 만들고, Chatbot를 위한 제공하기 위한 API는 [AWS CDK](https://aws.amazon.com/ko/cdk/)를 이용하여 설치합니다. 생성된 Chatbot은 REST API를 통하여 텍스트로 요청을 하고 결과를 화면에 표시할 수 있습니다. 상세한 Architecture는 아래와 같습니다. 
 
 <img src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/13c45617-9b47-4d8d-a68d-a344e0cb8bc3" width="700">
 
-1) 사용자는 [Amazon CloudFront](https://aws.amazon.com/ko/cloudfront/)를 통해 채팅 웹페이지에 접속합니다. 이때 HTML을 포함한 리소스는 [Amazon S3](https://aws.amazon.com/ko/pm/serv-s3/?nc1=h_ls)에서 읽어옵니다.
-2) 채팅화면에서 사용자가 메시지를 입력하여, '/chat' API를 이용하여 CloudFront로 요청됩니다.
+1) 사용자는 [Amazon CloudFront](https://aws.amazon.com/ko/cloudfront/)를 통해 Chatbot 웹페이지에 접속합니다. 이때 HTML, CSS, JS와 같은 리소스는 [Amazon S3](https://aws.amazon.com/ko/pm/serv-s3/?nc1=h_ls)에서 읽어옵니다.
+2) 채팅 화면에서 사용자가 메시지를 입력하면, chat API가 호출되어, CloudFront로 요청을 보냅니다.
 3) CloudFront는 [AWS API Gateway](https://aws.amazon.com/ko/api-gateway/)로 요청을 전달합니다.
-4) API Gateway는 [AWS Lambda](https://aws.amazon.com/ko/lambda/)로 전달되면, SageMaker Endpoint로 메시지를 전달합니다.
-5) SageMaker Endpoint는 Falcon FM을 통해 요청된 텍스트에 대한 답변을 생성합니다.
-
-
+4) API Gateway는 Chat을 담당하는 [AWS Lambda](https://aws.amazon.com/ko/lambda/)로 요청을 이벤트로 전달하게 되고, Lambda는 이벤트에서 메시지를 parsing하여 SageMaker Endpoint로 전달합니다.
+5) Lambda가 SageMaker Endpoint로 요청을 전달하면 Falcon FM을 통해 요청된 텍스트에 대한 답변을 생성합니다.
 
 
 ## 구현하기
@@ -25,7 +23,7 @@
 }
 ```
 
-사용자가 입력한 text는 CloudFront - API Gateway를 통해 Lambda로 전달됩니다. Lambda는 event에서 메시지(text)분리한 후에 payload를 생성합니다. 상세한 내용은 [lambda_function.py
+사용자가 입력한 메시지는 CloudFront - API Gateway를 통해 Lambda로 전달됩니다. Lambda는 이벤트(event)에서 메시지(text)를 분리한 후에 payload를 생성합니다. 상세한 내용은 [lambda_function.py
 ](./lambda-chat/lambda_function.py)을 참조합니다. 여기서 payload의 parameters는 [Falcon Parameters](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/blob/main/falcon-parameters.md)을 참조합니다.
 
 ```python
@@ -99,7 +97,7 @@ if(statusCode==200):
 
 ### PDF 파일 요약 
 
-Chatbot 대화창 하단의 파일 업로드 버튼을 클릭하여 PDF 파일을 업로드하면, 중복을 피하기 위하여 UUID(Universally Unique IDentifier)로 이름을 생성하여 uuid.pdf 형식으로 S3에 저장합니다. 이후 '/pdf' API를 이용해 Falcon FM에 파일 요약을 요청합니다. 이때 요청하는 메시지의 형태는 아래와 같습니다.
+Chatbot 대화창 하단의 파일 업로드 버튼을 클릭하여 PDF 파일을 업로드하면, 중복을 피하기 위하여 UUID(Universally Unique IDentifier)를 이름으로 가지는 Object로 S3에 저장합니다. 이후 '/pdf' API를 이용해 Falcon FM에 파일 요약(Summary)을 요청합니다. 이때 요청하는 메시지의 형태는 아래와 같습니다.
 
 ```java
 {
@@ -124,7 +122,7 @@ contents = '\n'.join(raw_text)
 new_contents = str(contents[: 4000]).replace("\n", " ")
 ```
 
-이후 pdf파일의 내용을 포함하여 payload를 생성하고 SageMaker Endpoint에 prompt로 전달합니다. 이때의 결과는 pdf파일의 내용이 요약된 Summary 메시지입니다.
+이후 pdf파일의 내용을 포함하여 payload를 생성하고 SageMaker Endpoint에 전달합니다. 이때의 결과는 pdf파일의 내용이 요약(Summary) 메시지입니다.
 
 ```python
 text = 'Create a 200 words summary of this document: ' + new_contents
@@ -191,3 +189,7 @@ cdk destroy
 ```
 
 Falcon FM 모델의 inference를 위해 GPU를 포함한 "ml.g5.2xlarge"를 사용하고 있으므로, 더이상 사용하지 않을 경우에 반드시 삭제하여야 합니다. 이를 위해 [Inference Console](https://ap-northeast-2.console.aws.amazon.com/sagemaker/home?region=ap-northeast-2#/endpoints)에 접속해서 Endpoint를 삭제합니다. 마찬가지로 [Model console](https://ap-northeast-2.console.aws.amazon.com/sagemaker/home?region=ap-northeast-2#/models)과 [Endpoint configuration](https://ap-northeast-2.console.aws.amazon.com/sagemaker/home?region=ap-northeast-2#/endpointConfig)에서 설치한 Falcon을 삭제합니다. 
+
+## 결론
+
+AWS 서울 리전에서 Falcon FM 기반의 Chatbot을 생성하여 텍스트에 대한 요청 및 PDF 파일의 요약(Summary)를 수행하였습니다. [Falcon FM](https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard)은 Open LLM Leaderboard에서 1등 (2023년 7월 기준)을 할만큼 우수한 성능을 가지고 있고, 상용을 포함한 라이선스에도 자유롭습니다. 또한, Falcon FM은 SageMaker JumpStart에서 편리하게 설치하고 활용할 수 있으며, 이제 AWS 서울 리전에서 EC2 G5와 같은 우수한 인프라를 통해 쉽고 빠르게 개발 및 상용이 가능합니다. LLM (Large Language Models) 기반의 Chatbot은 기존 Rule-based의 Chatbot에 비하여 훨씬 우수한 대화능력을 보여주며, 또한 AWS Lambda, CloudFront, API Gateway, S3와 같은 인프라를 이용하여 쉽게 구현할 수 있습니다. 근래에 다양하고 성능좋은 LLM들이 많이 나오고 한글도 일부 지원되고 있어서 향후 다양한 용도로 많은 활용이 기대됩니다.
