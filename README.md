@@ -10,9 +10,17 @@
 
 ## 구현하기
 
-### Chatbot API 
+### 메시지 전송
 
-사용자가 입력한 text는 CloudFront - API Gateway를 통해 Lambda로 전달됩니다. 이때 전달된 텍스트 입력을 event에서 분리한 후에 payload를 생성합니다. 상세한 내용은 [lambda_function.py
+사용자가 메시지를 입력하여 전송하면 '/chat' API를 이용해 메시지를 전송합니다. 이때의 body의 메시지 포맷은 아래와 같습니다.
+
+```java
+{
+    "text": "Building a website can be done in 10 simple steps"
+}
+```
+
+사용자가 입력한 text는 CloudFront - API Gateway를 통해 Lambda로 전달됩니다. Lambda는 event에서 메시지(text)분리한 후에 payload를 생성합니다. 상세한 내용은 [lambda_function.py
 ](./lambda-chat/lambda_function.py)을 참조합니다. 여기서 payload의 parameters는 [Falcon Parameters](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/blob/main/falcon-parameters.md)을 참조합니다.
 
 ```python
@@ -50,7 +58,7 @@ if(statusCode==200):
             outputText = outputText + resp['generated_text'] + '\n'
 ```
 
-참고로 Falcon의 Response 예는 아래와 같습니다.
+전달된 payload에 대한 SageMaker Endpoint의 Response 예는 아래와 같습니다.
 
 ```json
 {
@@ -73,7 +81,7 @@ if(statusCode==200):
 }
 ```
 
-이때 Body는 json 포맷으로 decoding하면 아래와 같습니다.
+여기서 Body는 json 포맷으로 decoding하면 아래와 같습니다.
 
 ```json
 [
@@ -82,6 +90,59 @@ if(statusCode==200):
    }
 ]
 ```
+
+
+### PDF 파일 요약 
+
+Chatbot 대화창 하단의 파일 업로드 버튼을 클릭하여 PDF 파일을 업로드하면, 중복을 피하기 위하여 UUID(Universally Unique IDentifier)로 이름을 생성하여 uuid.pdf 형식으로 [Amazon S3](https://aws.amazon.com/ko/pm/serv-s3/?nc1=h_ls)에 저장합니다. 이후 '/pdf' API를 이용해 Falcon FM에 파일 요약을 요청합니다. 이때 요청하는 메시지의 형태는 아래와 같습니다.
+
+```java
+{
+    "object": "3efe99b5-1a85-4f01-b268-10bdc7a673e7.pdf"
+}
+```
+
+[lambda-pdf](./lambda-pdf/lambda_function.py)와 같이 S3에서 PDF Object를 로드하여 text를 분리 합니다.
+
+```python
+s3r = boto3.resource("s3")
+doc = s3r.Object(s3_bucket, s3_prefix + '/' + s3_file_name)
+
+contents = doc.get()['Body'].read()
+reader = PyPDF2.PdfReader(BytesIO(contents))
+
+raw_text = []
+for page in reader.pages:
+    raw_text.append(page.extract_text())
+contents = '\n'.join(raw_text)
+
+new_contents = str(contents[: 4000]).replace("\n", " ")
+```
+
+이후 pdf파일의 내용을 포함하여 payload를 생성하고 SageMaker Endpoint에 prompt로 전달합니다. 이때의 결과는 pdf파일의 내용이 요약된 Summary 메시지입니다.
+
+```python
+text = 'Create a 200 words summary of this document: ' + new_contents
+payload = {
+    "inputs": text,
+    "parameters": {
+        "max_new_tokens": 300,
+    }
+}
+
+endpoint_name = os.environ.get('endpoint')
+response = query_endpoint(payload, endpoint_name)
+
+statusCode = response['statusCode']
+if (statusCode == 200):
+    response_payload = response['body']
+
+if response_payload != '':
+    summary = response_payload
+else:
+    summary = 'Falcon did not find an answer to your question, please try again'
+```
+
 
 ### 인프라 구현
 
