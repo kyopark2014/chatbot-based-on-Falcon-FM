@@ -182,7 +182,7 @@ else:
 ![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/039ea686-dd2c-4dc6-8deb-730e7d191ee1)
 
 
-### 인프라 정리하기
+### 리소스 정리하기
 
 Cloud9에 접속하여 아래와 같이 삭제를 합니다.
 
