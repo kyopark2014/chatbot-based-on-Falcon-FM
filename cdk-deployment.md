@@ -22,7 +22,22 @@ git clone https://github.com/kyopark2014/chatbot-based-on-Falcon-FM
 cd chatbot-based-on-Falcon-FM/cdk-chatbot-falcon/ && npm install
 ```
 
-5) Endpoint주소를 업데이트 합니다.
+5) CDK를 위해 Boostraping을 수행합니다.
+
+아래 명령어로 Account ID를 확인합니다.
+
+```java
+aws sts get-caller-identity --query Account --output text
+```
+
+아래와 같이 bootstrap을 수행합니다. 여기서 "account-id"는 상기 명령어로 확인한 12자리의 Account ID입니다. bootstrap 1회만 수행하면 되므로, 기존에 cdk를 사용하고 있었다면 bootstrap은 건너뛰어도 됩니다.
+
+```java
+cdk bootstrap aws://account-id/ap-northeast-2
+```
+
+
+6) Endpoint주소를 업데이트 합니다.
 
 Endpoint 주소는 [Falcon FM 생성](./deploy-falcon-fm.md)에서 얻은 Endpoint의 이름입니다. 아래와 같이 "chatbot-based-on-Falcon-FM/cdk-chatbot-falcon/lib/cdk-chatbot-falcon-stack.ts"를 열어서 "endpoint"의 값을 업데이트 합니다.
 
