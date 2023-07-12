@@ -168,12 +168,12 @@ else:
 
 ### 실행 결과 확인
 
-1) "Building a website can be done in 10 simple steps"에 대한 답변
+1) "Building a website can be done in 10 simple steps"로 질문하면 각 단계별로 아래와 같이 답변하는것을 확인할 수 있습니다.
 
 ![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/9b129b87-e21d-42b2-8de3-78632c62767b)
 
 
-2) "Guide me how to travel from New York to LA."에 대한 답변
+2) "Guide me how to travel from New York to LA."로 질문하면 여행방법을 설명합니다.
 
 ![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/2b7d414c-adf0-4694-86a2-40be2483fa50)
 
