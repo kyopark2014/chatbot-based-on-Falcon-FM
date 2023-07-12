@@ -178,7 +178,7 @@ else:
 
 3) 파일 아이콘을 선택하여 pdf파일을 선택하면 파일 요약 내용을 아래와 같이 확인할 수 있습니다. 여기서 구현한 Chatbot은 간단한 동작테스트용으로 업로드하는 파일은 5MB 이하로 제한됩니다.
 
-![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/32bb889f-1413-4885-95dd-86302dae7783)
+![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/8fd7cbd7-67df-48d5-ae1c-6b2e2085a3cb)
 
 
 ### 인프라 정리하기
