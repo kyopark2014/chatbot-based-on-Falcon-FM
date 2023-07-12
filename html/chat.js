@@ -196,8 +196,9 @@ attachFile.addEventListener('click', function(){
 
                         sendRequestPDF(response.Key);
                     }
-                    else {
-                        addSentMessagePDF("The request was failed. The size of PDF file should be less than 5MB.");
+                    else if(xmlHttp.status != 200) {
+                        console.log('status' + xmlHttp.status);
+                        alert("Try again! The request was failed. The size of PDF file should be less than 5MB");
                     }
                 };
                 
@@ -205,7 +206,7 @@ attachFile.addEventListener('click', function(){
                 console.log(xmlHttp.responseText);  
             }
             else {
-                alert("Only PDF file is suported!");
+                
             }
             
                        
