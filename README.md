@@ -1,10 +1,14 @@
 # Falcon FM을 이용한 Chatbot 만들기
 
-[AWS 서울 리전에서 EC2 G5를 사용](https://aws.amazon.com/ko/about-aws/whats-new/2023/06/amazon-ec2-g5-instances-additional-regions/)할 수 있게 되었습니다. 여기서는 [Falcon Foundation Model](https://aws.amazon.com/ko/blogs/machine-learning/technology-innovation-institute-trains-the-state-of-the-art-falcon-llm-40b-foundation-model-on-amazon-sagemaker/)을 [Amazon SageMaker JumpStart](https://aws.amazon.com/ko/sagemaker/jumpstart/?sagemaker-data-wrangler-whats-new.sort-by=item.additionalFields.postDateTime&sagemaker-data-wrangler-whats-new.sort-order=desc)를 이용해 AWS 서울 리전의 EC2 G5에 설치하고, 웹브라우저 기반의 Chatbot을 생성하는 방법에 대해 설명합니다. 이때의 Architecture는 아래와 같습니다.
-
-사용자는 CloudFront를 통해 채팅 웹페이지에 접속합니다. 이때 사용자가 텍스트를 입력하면 API Gateway를 통해 Lambda로 전달되면, SageMaker Endpoint를 통해 채팅에 대한 요청을 처리합니다. 이때 SageMaker Endpoint는 Falcon Foundation Model의 응답을 전달합니다. 이때 Falcon Foundation Model은 SageMaker JumpStart를 통해 설치하고, Chatbot를 위한 API는 AWS CDK를 이용하여 설치합니다. 생성된 chatbot은 "/chat" API를 통하여 텍스트로 요청을 하고 응답을 화면에 표시할 수 있습니다.
+[AWS 서울 리전에서 EC2 G5를 사용](https://aws.amazon.com/ko/about-aws/whats-new/2023/06/amazon-ec2-g5-instances-additional-regions/)할 수 있게 되었습니다. 여기서는 [Falcon Foundation Model](https://aws.amazon.com/ko/blogs/machine-learning/technology-innovation-institute-trains-the-state-of-the-art-falcon-llm-40b-foundation-model-on-amazon-sagemaker/)을 [Amazon SageMaker JumpStart](https://aws.amazon.com/ko/sagemaker/jumpstart/?sagemaker-data-wrangler-whats-new.sort-by=item.additionalFields.postDateTime&sagemaker-data-wrangler-whats-new.sort-order=desc)를 이용해 AWS 서울 리전의 EC2 G5에 설치하고, 웹브라우저 기반의 Chatbot을 생성하는 방법에 대해 설명합니다. Falcon FM은 SageMaker JumpStart를 통해 설치하고, Chatbot를 위한 API는 [AWS CDK](https://aws.amazon.com/ko/cdk/)를 이용하여 설치합니다. 생성된 chatbot은 "/chat" API를 통하여 텍스트로 요청을 하고 응답을 화면에 표시할 수 있습니다. 상세한 Architecture는 아래와 같습니다. 
 
 <img src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/13c45617-9b47-4d8d-a68d-a344e0cb8bc3" width="700">
+
+1) 사용자는 [Amazon CloudFront](https://aws.amazon.com/ko/cloudfront/)를 통해 채팅 웹페이지에 접속합니다. 이때 HTML을 포함한 리소스는 [Amazon S3](https://aws.amazon.com/ko/pm/serv-s3/?nc1=h_ls)에서 읽어옵니다.
+2) 채팅화면에서 사용자가 메시지를 입력하여, '/chat' API를 이용하여 CloudFront로 요청됩니다.
+3) CloudFront는 [AWS API Gateway](https://aws.amazon.com/ko/api-gateway/)로 요청을 전달합니다.
+4) API Gateway는 [AWS Lambda](https://aws.amazon.com/ko/lambda/)로 전달되면, SageMaker Endpoint를 통해 채팅에 대한 요청을 처리합니다. 이때 SageMaker Endpoint는 Falcon FM의 응답을 전달합니다. 
+
 
 
 
@@ -94,7 +98,7 @@ if(statusCode==200):
 
 ### PDF 파일 요약 
 
-Chatbot 대화창 하단의 파일 업로드 버튼을 클릭하여 PDF 파일을 업로드하면, 중복을 피하기 위하여 UUID(Universally Unique IDentifier)로 이름을 생성하여 uuid.pdf 형식으로 [Amazon S3](https://aws.amazon.com/ko/pm/serv-s3/?nc1=h_ls)에 저장합니다. 이후 '/pdf' API를 이용해 Falcon FM에 파일 요약을 요청합니다. 이때 요청하는 메시지의 형태는 아래와 같습니다.
+Chatbot 대화창 하단의 파일 업로드 버튼을 클릭하여 PDF 파일을 업로드하면, 중복을 피하기 위하여 UUID(Universally Unique IDentifier)로 이름을 생성하여 uuid.pdf 형식으로 S3에 저장합니다. 이후 '/pdf' API를 이용해 Falcon FM에 파일 요약을 요청합니다. 이때 요청하는 메시지의 형태는 아래와 같습니다.
 
 ```java
 {
