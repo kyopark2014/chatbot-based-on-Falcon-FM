@@ -26,7 +26,7 @@ def get_summary_from_pdf(file_type, s3_file_name):
             raw_text.append(page.extract_text())
         contents = '\n'.join(raw_text)    
 
-        new_contents = str(contents[:4000]).replace("\n"," ")
+        new_contents = str(contents[:4000]).replace("\n"," ") 
         print('new_contents: ', new_contents)
 
         text = 'Create a 200 words summary of this document: '+ new_contents

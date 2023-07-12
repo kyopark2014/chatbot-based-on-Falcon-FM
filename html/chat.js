@@ -120,6 +120,17 @@ function addSentMessage(text) {
     sendRequest(text);    
 }       
 
+function addSentMessagePDF(text) {  
+    console.log("sent message: "+text);
+
+    var date = new Date();
+    var timestr = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+    index++;
+
+    msglist[index].innerHTML = 
+        `<div class="chat-sender chat-sender--right"><h1>${timestr}</h1>${text}&nbsp;<h2 id="status${index}"></h2></div>`;   
+}  
+
 function addReceivedMessage(msg) {
     // console.log("add received message: "+msg);
     sender = "Chatbot"
@@ -156,21 +167,24 @@ attachFile.addEventListener('click', function(){
     
     $(document).ready(function() {
         input.change(function(evt) {
-            // alert($(this).val());
+            var input = this;
+            var url_file = $(this).val();
+            var ext = url_file.substring(url_file.lastIndexOf('.') + 1).toLowerCase();
 
-            // let x = $(this).val();
-            // console.log('x: ' + x);
-            // let filename = x.replace(/^.*[\\\/]/, '')
-            // console.log('filename: '+filename);
-
-            const url = './upload';
+            console.log('url: ' + url_file);
+            console.log('ext: ' + ext);
+            
+            const url = 'upload';
             let formData = new FormData();
-            formData.append("attachFile" , $(this));
+            formData.append("attachFile" , input.files[0]);
             
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.open("POST", url, true);                 
             xmlHttp.setRequestHeader('Content-Type', 'application/pdf');
             //xmlHttp.setRequestHeader('Content-Disposition', 'form-data; name="'+name+'"; filename="'+filename+'"');
+
+            addSentMessagePDF("uploading the selected pdf in order to summerize...");
+            chatPanel.scrollTop = chatPanel.scrollHeight;  // scroll needs to move bottom
             
             xmlHttp.onreadystatechange = function() {
                 if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200 ) {
