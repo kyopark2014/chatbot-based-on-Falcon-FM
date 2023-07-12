@@ -2,7 +2,7 @@
 
 [cdk-chatbot-falcon-stack.ts](./lib/cdk-chatbot-falcon-stack.ts)에 대해 설명합니다.
 
-Chatbot에서 chat을 처리하는 lambda를 python3.9로 아래와 같이 구현합니다. 이때 endpoint는 이전에 Falcon FM 모델후 생성된 endpoint 이름을 입력합니다.
+Chatbot에서 chat을 처리하는 lambda를 python3.9로 아래와 같이 구현합니다. 이때 environment의 endpoint는 Falcon FM에서 생성된 endpoint 이름을 입력합니다.
 
 ```python
 const lambdaChatApi = new lambda.Function(this, 'lambda-chat', {
