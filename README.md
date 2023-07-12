@@ -11,7 +11,7 @@
 5) Lambda가 SageMaker Endpoint로 요청을 전달하면 Falcon FM을 통해 요청된 텍스트에 대한 답변을 생성합니다.
 
 
-## 구현하기
+## Architecture 구현하기
 
 ### 메시지 전송
 
