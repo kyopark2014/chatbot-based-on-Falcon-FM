@@ -2,7 +2,7 @@
 
 [cdk-chatbot-falcon-stack.ts](./lib/cdk-chatbot-falcon-stack.ts)에 대해 설명합니다.
 
-chatbot을 구현하는 lambda를 python3.9로 아래와 같이 구현합니다. 이때 endpoint는 이전에 Falcon FM 모델후 생성된 endpoint 이름을 입력합니다.
+Chatbot에서 chat을 처리하는 lambda를 python3.9로 아래와 같이 구현합니다. 이때 endpoint는 이전에 Falcon FM 모델후 생성된 endpoint 이름을 입력합니다.
 
 ```python
 const lambdaChatApi = new lambda.Function(this, 'lambda-chat', {
@@ -19,7 +19,7 @@ const lambdaChatApi = new lambda.Function(this, 'lambda-chat', {
 });
 ```
 
-Lambda의 퍼미션은 아래와 같이 SageMaker와 API Gateway를 invoke할수 있도록 설정합니다.
+lambda-chat의 퍼미션은 아래와 같이 SageMaker를 사용할 수 있는 권한와 API Gateway를 invoke 할 수 있도록 설정합니다.
 
 ```python
 const SageMakerPolicy = new iam.PolicyStatement({  
@@ -34,6 +34,32 @@ lambdaChatApi.role?.attachInlinePolicy(
 lambdaChatApi.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  
 ```
 
+마찬가지로 PDF에서 요약(Summary)를 수행하는 lambda-pdf를 정의합니다. 파일 저장할 bucket의 이름과 폴더를 지정하고, SageMaker, S3 읽기, API Gateway Invoke에 대한 권한을 설정합니다. 
+
+```python
+const lambdaPdfApi = new lambda.Function(this, 'lambda-pdf', {
+    description: 'lambda for pdf api',
+    functionName: 'lambda-pdf-api',
+    handler: 'lambda_function.lambda_handler',
+    runtime: lambda.Runtime.PYTHON_3_9,
+    code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-pdf')),
+    timeout: cdk.Duration.seconds(120),
+    logRetention: logs.RetentionDays.ONE_DAY,
+    environment: {
+        endpoint: endpoint,
+        s3_bucket: s3Bucket.bucketName,
+        s3_prefix: s3_prefix
+    }
+});
+
+lambdaPdfApi.role?.attachInlinePolicy( // add sagemaker policy
+    new iam.Policy(this, 'sagemaker-policy-for-lambda-pdf', {
+        statements: [SageMakerPolicy],
+    }),
+);
+s3Bucket.grantRead(lambdaPdfApi); // permission for s3
+lambdaPdfApi.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));
+```
 
 API Gateway에 대한 권한 및 POST 방식의 '/chat' API를 생성합니다.
 
@@ -86,7 +112,7 @@ chat.addMethod('POST', new apiGateway.LambdaIntegration(lambdaChatApi, {
 ```
 
 
-CloudFront는 아래와 같이 설정합니다.
+CloudFront와 API Gateway를 연결하도록 아래와 같이 설정합니다.
 
 ```python
 const distribution = new cloudFront.Distribution(this, 'cloudfront', {
@@ -103,10 +129,15 @@ new cdk.CfnOutput(this, 'distributionDomainName', {
     description: 'The domain name of the Distribution',
 });
 
-
 distribution.addBehavior("/chat", new origins.RestApiOrigin(api), {
     cachePolicy: cloudFront.CachePolicy.CACHING_DISABLED,
     allowedMethods: cloudFront.AllowedMethods.ALLOW_ALL,
     viewerProtocolPolicy: cloudFront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
 });
 ```
+
+마찬가지로 [cdk-chatbot-falcon-stack.ts](./cdk-chatbot-falcon/lib/cdk-chatbot-falcon-stack.ts)에서는 '/pdf', '/upload' API를 설정하고 있습니다.
+
+
+
+
