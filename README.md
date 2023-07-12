@@ -7,7 +7,7 @@
 1) 사용자는 [Amazon CloudFront](https://aws.amazon.com/ko/cloudfront/)를 통해 채팅 웹페이지에 접속합니다. 이때 HTML을 포함한 리소스는 [Amazon S3](https://aws.amazon.com/ko/pm/serv-s3/?nc1=h_ls)에서 읽어옵니다.
 2) 채팅화면에서 사용자가 메시지를 입력하여, '/chat' API를 이용하여 CloudFront로 요청됩니다.
 3) CloudFront는 [AWS API Gateway](https://aws.amazon.com/ko/api-gateway/)로 요청을 전달합니다.
-4) API Gateway는 [AWS Lambda](https://aws.amazon.com/ko/lambda/)로 전달되면, SageMaker Endpoint를 통해 채팅에 대한 요청을 처리합니다. 이때 SageMaker Endpoint는 Falcon FM의 응답을 전달합니다. 
+4) API Gateway는 [AWS Lambda](https://aws.amazon.com/ko/lambda/)로 전달되면, SageMaker Endpoint를 통해 채팅에 대한 요청을 처리합니다. 이때 SageMaker Endpoint는 Falcon FM의 응답을 전달합니다. 
 
 
 
