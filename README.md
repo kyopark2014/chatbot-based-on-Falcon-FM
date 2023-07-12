@@ -154,7 +154,7 @@ else:
 [CDK 구현](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/blob/main/cdk-chatbot-falcon/README.md)은 CDK로 인프라를 구현하는 코드를 구성하는 방법에 대해 설명하고 있습니다.
 
 
-## 직접 실습하기
+## 직접 실습해 보기
 
 ### Falcon FM 설치
 
