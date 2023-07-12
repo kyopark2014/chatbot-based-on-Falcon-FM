@@ -98,7 +98,7 @@ if(statusCode==200):
 
 ### PDF 파일 요약 
 
-Chatbot 대화창 하단의 파일 업로드 버튼을 클릭하여 PDF 파일을 업로드하면, 중복을 피하기 위하여 UUID(Universally Unique IDentifier)로 이름을 생성하여 uuid.pdf 형식으로 S3에 저장합니다. 이후 '/pdf' API를 이용해 Falcon FM에 파일 요약을 요청합니다. 이때 요청하는 메시지의 형태는 아래와 같습니다.
+Chatbot 대화창 하단의 파일 업로드 버튼을 클릭하여 PDF 파일을 업로드하면, 중복을 피하기 위하여 UUID(Universally Unique IDentifier)로 이름을 생성하여 uuid.pdf 형식으로 S3에 저장합니다. 이후 '/pdf' API를 이용해 Falcon FM에 파일 요약을 요청합니다. 이때 요청하는 메시지의 형태는 아래와 같습니다.
 
 ```java
 {
