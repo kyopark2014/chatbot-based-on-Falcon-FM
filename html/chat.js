@@ -196,6 +196,9 @@ attachFile.addEventListener('click', function(){
 
                         sendRequestPDF(response.Key);
                     }
+                    else {
+                        addSentMessagePDF("The request was failed. The size of PDF file should be less than 5MB.");
+                    }
                 };
                 
                 xmlHttp.send(formData); 
