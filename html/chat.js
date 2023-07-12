@@ -173,32 +173,39 @@ attachFile.addEventListener('click', function(){
 
             console.log('url: ' + url_file);
             console.log('ext: ' + ext);
-            
-            const url = 'upload';
-            let formData = new FormData();
-            formData.append("attachFile" , input.files[0]);
-            
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open("POST", url, true);                 
-            xmlHttp.setRequestHeader('Content-Type', 'application/pdf');
-            //xmlHttp.setRequestHeader('Content-Disposition', 'form-data; name="'+name+'"; filename="'+filename+'"');
 
-            addSentMessagePDF("uploading the selected pdf in order to summerize...");
-            chatPanel.scrollTop = chatPanel.scrollHeight;  // scroll needs to move bottom
-            
-            xmlHttp.onreadystatechange = function() {
-                if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200 ) {
-                    console.log(xmlHttp.responseText);
+            if(ext == 'pdf') {
+                const url = 'upload';
+                let formData = new FormData();
+                formData.append("attachFile" , input.files[0]);
+                
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open("POST", url, true);                 
+                xmlHttp.setRequestHeader('Content-Type', 'application/pdf');
+                //xmlHttp.setRequestHeader('Content-Disposition', 'form-data; name="'+name+'"; filename="'+filename+'"');
 
-                    response = JSON.parse(xmlHttp.responseText);
-                    console.log('upload file nmae: ' + response.Key);
+                addSentMessagePDF("uploading the selected pdf in order to summerize...");
+                chatPanel.scrollTop = chatPanel.scrollHeight;  // scroll needs to move bottom
+                
+                xmlHttp.onreadystatechange = function() {
+                    if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200 ) {
+                        console.log(xmlHttp.responseText);
 
-                    sendRequestPDF(response.Key);
-                }
-            };
+                        response = JSON.parse(xmlHttp.responseText);
+                        console.log('upload file nmae: ' + response.Key);
+
+                        sendRequestPDF(response.Key);
+                    }
+                };
+                
+                xmlHttp.send(formData); 
+                console.log(xmlHttp.responseText);  
+            }
+            else {
+                alert("Only PDF file is suported!");
+            }
             
-            xmlHttp.send(formData); 
-            console.log(xmlHttp.responseText);             
+                       
         });
     });
        
