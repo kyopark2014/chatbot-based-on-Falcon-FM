@@ -22,7 +22,7 @@ class ContentHandler(LLMContentHandler):
 
     def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
         #input_str = json.dumps({'inputs': prompt, **model_kwargs})
-        input_str = json.dumps({'inputs': prompt, "parameters": model_kwargs})
+        input_str = json.dumps({'inputs': prompt, 'parameters': model_kwargs})
         return input_str.encode('utf-8')
       
     def transform_output(self, output: bytes) -> str:
@@ -48,7 +48,7 @@ def get_summary_from_pdf(file_type, s3_file_name):
 
         aws_region = boto3.Session().region_name
         parameters = {
-            "max_length": 200
+            "max_new_tokens": 300,
         }        
         content_handler = ContentHandler()
 
