@@ -107,12 +107,12 @@ export class CdkChatbotFalconStack extends cdk.Stack {
       }
     }); */
     // Create ML Lambda
-    const lambdaPdfApi = new lambda.DockerImageFunction(this, "lambda-pdf", {
+    const lambdaPdfApi = new lambda.DockerImageFunction(this, "lambda-pdf-summay", {
       description: 'lambda for pdf api',
       functionName: 'lambda-pdf-api',
       code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../../lambda-pdf-summary')),
-      timeout: cdk.Duration.seconds(120),
-      logRetention: logs.RetentionDays.ONE_DAY,
+      timeout: cdk.Duration.seconds(60),
+      //logRetention: logs.RetentionDays.ONE_DAY,
       environment: {
         endpoint: endpoint,
         s3_bucket: s3Bucket.bucketName,
