@@ -107,7 +107,7 @@ Chatbot 대화창 하단의 파일 업로드 버튼을 클릭하여 PDF 파일�
 }
 ```
 
-[lambda-pdf](./lambda-pdf/lambda_function.py)와 같이 S3에서 PDF Object를 로드하여 text를 분리 합니다.
+[lambda-pdf](./lambda-pdf-summary/lambda_function.py)와 같이 S3에서 PDF Object를 로드하여 text를 분리 합니다.
 
 ```python
 s3r = boto3.resource("s3")
@@ -120,32 +120,67 @@ raw_text = []
 for page in reader.pages:
     raw_text.append(page.extract_text())
 contents = '\n'.join(raw_text)
-
-new_contents = str(contents[: 4000]).replace("\n", " ")
 ```
 
-이후 pdf파일의 내용을 포함하여 payload를 생성하고 SageMaker Endpoint에 전달합니다. 이때의 결과는 pdf파일의 내용이 요약(Summary) 메시지입니다.
+여기서는 [LangChain Summation](https://python.langchain.com/docs/use_cases/summarization)을 이용하여 PDF 파읽을 읽어서 파일 요약기능을 제공합니다. LangChain이 SageMaker Endpoint의 입력 포맷을 읽어올 수 있도록 아래와 같이 ContentHandler Class를 정의합니다.
 
 ```python
-text = 'Create a 200 words summary of this document: ' + new_contents
-payload = {
-    "inputs": text,
-    "parameters": {
-        "max_new_tokens": 300,
-    }
+class ContentHandler(LLMContentHandler):
+    content_type = "application/json"
+    accepts = "application/json"
+
+    def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
+        input_str = json.dumps({'inputs': prompt, 'parameters': model_kwargs})
+        return input_str.encode('utf-8')
+      
+    def transform_output(self, output: bytes) -> str:
+        response_json = json.loads(output.read().decode("utf-8"))
+        return response_json[0]["generated_text"]
+
+content_handler = ContentHandler()
+```
+
+이제 SageMaker Endpoint를 보도록 llm을 정의합니다.
+```python
+aws_region = boto3.Session().region_name
+parameters = {
+    "max_new_tokens": 300,
 }
+content_handler = ContentHandler()
 
-endpoint_name = os.environ.get('endpoint')
-response = query_endpoint(payload, endpoint_name)
+llm = SagemakerEndpoint(
+    endpoint_name = endpoint_name,
+    region_name = aws_region,
+    model_kwargs = parameters,
+    content_handler = content_handler
+)
+```
 
-statusCode = response['statusCode']
-if (statusCode == 200):
-    response_payload = response['body']
+문서의 크기가 크므로 RecursiveCharacterTextSplitter를 이용해 chunk 단위로 분리하고 Document에 저장합니다. 이후 load_summarize_chain를 이용해 요약합니다.
 
-if response_payload != '':
-    summary = response_payload
-else:
-    summary = 'Falcon did not find an answer to your question, please try again'
+```python
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains.summarize import load_summarize_chain
+from langchain import PromptTemplate, SagemakerEndpoint
+
+new_contents = str(contents).replace("\n", " ")
+text_splitter = RecursiveCharacterTextSplitter(chunk_size = 1000, chunk_overlap = 0)
+texts = text_splitter.split_text(new_contents)
+
+docs = [
+    Document(
+        page_content = t
+    ) for t in texts[: 3]
+]
+prompt_template = """Write a concise summary of the following:
+
+{ text }
+        
+        CONCISE SUMMARY """
+
+PROMPT = PromptTemplate(template = prompt_template, input_variables = ["text"])
+chain = load_summarize_chain(llm, chain_type = "stuff", prompt = PROMPT)
+summary = chain.run(docs)
 ```
 
 
