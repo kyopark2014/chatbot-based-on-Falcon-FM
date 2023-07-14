@@ -5,7 +5,7 @@ RUN /var/lang/bin/python3.8 -m pip install --upgrade pip
 
 WORKDIR /var/task/lambda-pdf-summary
 
-COPY inference.py /var/task/
+COPY lambda_function.py /var/task/
 COPY . .
 
 RUN pip install -r requirements.txt
