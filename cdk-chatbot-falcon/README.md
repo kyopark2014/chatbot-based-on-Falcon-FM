@@ -34,22 +34,25 @@ lambdaChatApi.role?.attachInlinePolicy(
 lambdaChatApi.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  
 ```
 
-마찬가지로 PDF에서 요약(Summary)를 수행하는 lambda-pdf를 정의합니다. 파일 저장할 bucket의 이름과 폴더를 지정하고, SageMaker, S3 읽기, API Gateway Invoke에 대한 권한을 설정합니다. 
+마찬가지로 PDF에서 요약(Summary)를 수행하는 lambda-pdf-summay를 Docker Conatiner를 이용하여 정의합니다. 아래와 같이 파일 저장할 bucket의 이름과 폴더를 지정하고, SageMaker, S3 읽기, API Gateway Invoke에 대한 권한을 설정합니다. 
 
 ```python
-const lambdaPdfApi = new lambda.Function(this, 'lambda-pdf', {
+const lambdaPdfApi = new lambda.DockerImageFunction(this, "lambda-pdf-summay", {
     description: 'lambda for pdf api',
     functionName: 'lambda-pdf-api',
-    handler: 'lambda_function.lambda_handler',
-    runtime: lambda.Runtime.PYTHON_3_9,
-    code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-pdf')),
-    timeout: cdk.Duration.seconds(120),
-    logRetention: logs.RetentionDays.ONE_DAY,
+    code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../../lambda-pdf-summary')),
+    timeout: cdk.Duration.seconds(60),
+    //logRetention: logs.RetentionDays.ONE_DAY,
     environment: {
         endpoint: endpoint,
         s3_bucket: s3Bucket.bucketName,
         s3_prefix: s3_prefix
     }
+});
+const version = lambdaPdfApi.currentVersion;
+const alias = new lambda.Alias(this, 'LambdaAlias', {
+    aliasName: 'Dev',
+    version,
 });
 
 lambdaPdfApi.role?.attachInlinePolicy( // add sagemaker policy
