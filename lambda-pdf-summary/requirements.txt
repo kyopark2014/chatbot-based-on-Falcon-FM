@@ -1,3 +1,0 @@
-#urllib3<2
-PyPDF2
-#langchain

@@ -10,6 +10,4 @@ WORKDIR /var/task/lambda-pdf-summary
 COPY lambda_function.py /var/task/
 COPY . .
 
-#RUN pip install -r requirements.txt
-
 CMD ["lambda_function.lambda_handler"]
