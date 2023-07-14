@@ -68,23 +68,18 @@ def get_summary_from_pdf(file_type, s3_file_name):
         docs = [
             Document(
                 page_content=t
-            ) for t in texts[:5]
+            ) for t in texts[:3]
         ]
+        prompt_template = """Write a concise summary of the following:
 
-#        prompt_template = """Write a concise summary of the following:
-#
-#        {text}
-#        
-#        CONCISE SUMMARY """
-#
-#        PROMPT = PromptTemplate(template=prompt_template, input_variables=["text"])
-#        chain = load_summarize_chain(llm, chain_type="stuff", prompt=PROMPT)
-#        summary = chain.run(docs)
-#        print('summary: ', summary)
+        {text}
+        
+        CONCISE SUMMARY """
 
-        chain = load_summarize_chain(llm, chain_type="map_reduce")
+        PROMPT = PromptTemplate(template=prompt_template, input_variables=["text"])
+        chain = load_summarize_chain(llm, chain_type="stuff", prompt=PROMPT)
         summary = chain.run(docs)
-        print(summary)
+        print('summary: ', summary)
             
     return summary    
         
