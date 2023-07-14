@@ -2,7 +2,6 @@ import json
 import boto3
 import os
 import time
-from multiprocessing import Process
 from io import BytesIO
 import PyPDF2
 from langchain import PromptTemplate, SagemakerEndpoint
@@ -22,8 +21,8 @@ class ContentHandler(LLMContentHandler):
     accepts = "application/json"
 
     def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-        #input_str = json.dumps({'inputs': prompt, **model_kwargs})
-        input_str = json.dumps({'inputs': prompt, 'parameters': model_kwargs})
+        input_str = json.dumps({'inputs': prompt, **model_kwargs})
+        #input_str = json.dumps({'inputs': prompt, 'parameters': model_kwargs})
         return input_str.encode('utf-8')
       
     def transform_output(self, output: bytes) -> str:
@@ -87,39 +86,7 @@ def get_summary_from_pdf(file_type, s3_file_name):
         print('summary: ', summary)
             
     return summary    
-    
-def query_endpoint(payload, endpoint_name):
-    client = boto3.client('runtime.sagemaker')
-    response = client.invoke_endpoint(
-        EndpointName=endpoint_name, 
-        ContentType='application/json', 
-        Body=json.dumps(payload).encode('utf-8'))                
-    print('response:', response)
         
-    statusCode = response['ResponseMetadata']['HTTPStatusCode']        
-    if(statusCode==200):
-        response_payload = json.loads(response['Body'].read())
-        print('response_payload:', response_payload)
-
-        outputText = ""
-        print('len:', len(response_payload))
-        if len(response_payload) == 1:
-            outputText = response_payload[0]['generated_text']
-        else:
-            for resp in response_payload:
-                outputText = outputText + resp['generated_text'] + '\n'
-                
-        return {
-            'statusCode': statusCode,
-            'body': outputText
-        }
-            
-    else:
-        return {
-            'statusCode': statusCode,
-            'body': json.dumps(response)
-        }
-    
 def lambda_handler(event, context):
     print(event)
 
