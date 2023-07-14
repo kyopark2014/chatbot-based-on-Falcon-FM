@@ -7,6 +7,10 @@ from io import BytesIO
 import PyPDF2
 from langchain import PromptTemplate, SagemakerEndpoint
 from langchain.llms.sagemaker_endpoint import LLMContentHandler
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.docstore.document import Document
+from langchain.chains.summarize import load_summarize_chain
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
@@ -18,8 +22,8 @@ class ContentHandler(LLMContentHandler):
     accepts = "application/json"
 
     def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-        input_str = json.dumps({'inputs': prompt, **model_kwargs})
-        #input_str = json.dumps({'inputs': prompt, 'parameters': model_kwargs})
+        #input_str = json.dumps({'inputs': prompt, **model_kwargs})
+        input_str = json.dumps({'inputs': prompt, 'parameters': model_kwargs})
         return input_str.encode('utf-8')
       
     def transform_output(self, output: bytes) -> str:
@@ -34,7 +38,6 @@ def get_summary_from_pdf(file_type, s3_file_name):
     if file_type == 'pdf':
         s3r = boto3.resource("s3")
         doc = s3r.Object(s3_bucket, s3_prefix+'/'+s3_file_name)
-        #doc = s3r.Object('cdkchatbotfalconstack-chatbotstoragef9db61b9-vbcslny70mso', '/docs/sample.pdf')
         
         contents = doc.get()['Body'].read()
         reader = PyPDF2.PdfReader(BytesIO(contents))
@@ -56,34 +59,33 @@ def get_summary_from_pdf(file_type, s3_file_name):
             model_kwargs = parameters,
             content_handler = content_handler
         )
-        output = llm('Building a website can be done in 10 simple steps')
-        print(output)
 
-        new_contents = str(contents[:4000]).replace("\n"," ") 
-        print('new_contents: ', new_contents)
+        #output = llm('Building a website can be done in 10 simple steps')
+        #print(output)
 
-        text = 'Create a 200 words summary of this document: '+ new_contents
-        payload = {
-                "inputs": text,
-                "parameters":{
-                    "max_new_tokens": 300,
-                }
-            }
+        #new_contents = str(contents[:4000]).replace("\n"," ") 
+        new_contents = str(contents).replace("\n"," ") 
+        #print('new_contents: ', new_contents)
+        print('length: ', len(new_contents))
+
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000,chunk_overlap=0)
+        texts = text_splitter.split_text(new_contents) 
+        print('texts[0]: ', texts[0])
+        
+        docs = [
+            Document(
+                page_content=t
+            ) for t in texts[:3]
+        ]
+        prompt_template = """Write a concise summary of the following:
+        {text}
+        CONCISE SUMMARY """
+
+        PROMPT = PromptTemplate(template=prompt_template, input_variables=["text"])
+        chain = load_summarize_chain(llm, chain_type="stuff", prompt=PROMPT)
+        summary = chain.run(docs)
+        print('summary: ', summary)
             
-        response = query_endpoint(payload, endpoint_name)
-        print('response:', response)
-
-        statusCode = response['statusCode']       
-        if(statusCode==200):
-            response_payload = response['body']
-            print('response_payload:', response_payload)
-
-        if response_payload != '':
-            summary = response_payload
-        else:
-            summary = 'Falcon did not find an answer to your question, please try again'               
-        print('summary:', summary)
-    
     return summary    
     
 def query_endpoint(payload, endpoint_name):
