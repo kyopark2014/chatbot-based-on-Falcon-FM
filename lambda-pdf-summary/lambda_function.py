@@ -72,7 +72,9 @@ def get_summary_from_pdf(file_type, s3_file_name):
             ) for t in texts[:3]
         ]
         prompt_template = """Write a concise summary of the following:
+
         {text}
+        
         CONCISE SUMMARY """
 
         PROMPT = PromptTemplate(template=prompt_template, input_variables=["text"])
