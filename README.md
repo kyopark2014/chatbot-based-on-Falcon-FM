@@ -214,7 +214,7 @@ summary = chain.run(docs)
 
 3) 파일 아이콘을 선택하여 pdf파일을 선택하면 파일 요약 내용을 아래와 같이 확인할 수 있습니다. 여기서는 [gen-ai-aws.pdf](./gen-ai-wiki.pdf)를 업로드 하였고 아래와 같은 요약 결과를 얻을 수 있습니다. 현재 Chatbot UI은 간단한 동작테스트용으로 업로드하는 파일은 5MB 이하로 제한됩니다.
 
-![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/c6ca4093-cefd-4c9b-ac45-171979163c37)
+![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/fd1f42fc-68f4-46f4-a4f8-55fae86ec71b)
 
 
 4) Question/Answering의 경우
