@@ -21,7 +21,6 @@ class ContentHandler(LLMContentHandler):
     accepts = "application/json"
 
     def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-        #input_str = json.dumps({'inputs': prompt, **model_kwargs})
         input_str = json.dumps({'inputs': prompt, 'parameters': model_kwargs})
         return input_str.encode('utf-8')
       
