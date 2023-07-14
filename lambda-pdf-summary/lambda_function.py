@@ -59,12 +59,7 @@ def get_summary_from_pdf(file_type, s3_file_name):
             content_handler = content_handler
         )
 
-        #output = llm('Building a website can be done in 10 simple steps')
-        #print(output)
-
-        #new_contents = str(contents[:4000]).replace("\n"," ") 
         new_contents = str(contents).replace("\n"," ") 
-        #print('new_contents: ', new_contents)
         print('length: ', len(new_contents))
 
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000,chunk_overlap=0)
@@ -104,8 +99,8 @@ def lambda_handler(event, context):
         }                                       
     else: 
         return {
-            'statusCode': 500,
-            'msg': "No contents",
+            'statusCode': 200,  # error notification
+            'msg': "Failed to get summary, please try again",
         }
     
     
