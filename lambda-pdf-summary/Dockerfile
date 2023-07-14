@@ -4,6 +4,7 @@ FROM amazon/aws-lambda-python:3.8
 RUN /var/lang/bin/python3.8 -m pip install --upgrade pip
 RUN /var/lang/bin/python3.8 -m pip install PyPDF2
 RUN /var/lang/bin/python3.8 -m pip install langchain
+RUN /var/lang/bin/python3.8 -m pip install transformers
 
 WORKDIR /var/task/lambda-pdf-summary
 
