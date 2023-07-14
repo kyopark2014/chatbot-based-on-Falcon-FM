@@ -202,6 +202,17 @@ Answer:
 
 <img width="885" alt="image" src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/d9baf58a-232d-437f-8d39-887f05324f29">
 
+4) Question/Answering의 경우Text Generation with simple prompt
+
+```text
+Write an email from Bob, Customer Service Manager, to the customer "John Doe" 
+who provided negative feedback on the service provided by our customer support 
+engineer
+```
+
+이때의 결과는 아래와 같습니다.
+
+<img width="875" alt="image" src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/102ff2cb-641c-4bbc-8259-54fb026c7464">
 
 ### 리소스 정리하기
 
