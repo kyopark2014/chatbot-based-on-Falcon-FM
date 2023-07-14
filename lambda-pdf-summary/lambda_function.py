@@ -11,6 +11,7 @@ from langchain.llms.sagemaker_endpoint import LLMContentHandler
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
 s3_prefix = os.environ.get('s3_prefix')
+endpoint_name = os.environ.get('endpoint')
 
 class ContentHandler(LLMContentHandler):
     content_type = "application/json"
@@ -68,8 +69,7 @@ def get_summary_from_pdf(file_type, s3_file_name):
                     "max_new_tokens": 300,
                 }
             }
-    
-        endpoint_name = os.environ.get('endpoint')
+            
         response = query_endpoint(payload, endpoint_name)
         print('response:', response)
 
