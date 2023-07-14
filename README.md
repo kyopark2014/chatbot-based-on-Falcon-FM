@@ -122,7 +122,7 @@ for page in reader.pages:
 contents = '\n'.join(raw_text)
 ```
 
-여기서는 [LangChain Summation](https://python.langchain.com/docs/use_cases/summarization)을 이용하여 PDF 파읽을 읽어서 파일 요약기능을 제공합니다. LangChain이 SageMaker Endpoint의 입력 포맷을 읽어올 수 있도록 아래와 같이 ContentHandler Class를 정의합니다.
+여기서는 [LangChain Summation](https://python.langchain.com/docs/use_cases/summarization)을 이용하여 PDF 파읽의 내용을 요약합니다. LangChain이 SageMaker Endpoint의 입력 포맷을 읽어올 수 있도록 아래와 같이 ContentHandler Class를 정의합니다.
 
 ```python
 class ContentHandler(LLMContentHandler):
