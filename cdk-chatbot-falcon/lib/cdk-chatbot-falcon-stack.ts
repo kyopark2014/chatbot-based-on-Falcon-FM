@@ -89,24 +89,24 @@ export class CdkChatbotFalconStack extends cdk.Stack {
     );
     lambdaChatApi.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  
 
-    // Lambda for pdf
-    /*
-    const lambdaPdfApi = new lambda.Function(this, 'lambda-pdf', {
-      description: 'lambda for pdf api',
-      functionName: 'lambda-pdf-api',
-      handler: 'lambda_function.lambda_handler',
-      runtime: lambda.Runtime.PYTHON_3_9,
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-pdf')),
-      // architecture: lambda.Architecture.ARM_64,
-      timeout: cdk.Duration.seconds(120),
-      logRetention: logs.RetentionDays.ONE_DAY,
-      environment: {
-        endpoint: endpoint,
-        s3_bucket: s3Bucket.bucketName,
-        s3_prefix: s3_prefix
-      }
-    }); */
-    // Create ML Lambda
+    // Lambda for pdf (basic - no langchain)
+    // const lambdaPdfApi = new lambda.Function(this, 'lambda-pdf', {
+    //   description: 'lambda for pdf api',
+    //   functionName: 'lambda-pdf-api',
+    //   handler: 'lambda_function.lambda_handler',
+    //   runtime: lambda.Runtime.PYTHON_3_9,
+    //   code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-pdf')),
+    //   // architecture: lambda.Architecture.ARM_64,
+    //   timeout: cdk.Duration.seconds(120),
+    //   logRetention: logs.RetentionDays.ONE_DAY,
+    //   environment: {
+    //     endpoint: endpoint,
+    //     s3_bucket: s3Bucket.bucketName,
+    //     s3_prefix: s3_prefix
+    //   }
+    // }); 
+
+    //  Lambda for pdf summary using langchain (container)
     const lambdaPdfApi = new lambda.DockerImageFunction(this, "lambda-pdf-summay", {
       description: 'lambda for pdf api',
       functionName: 'lambda-pdf-api',

@@ -5,8 +5,8 @@ import time
 from multiprocessing import Process
 from io import BytesIO
 import PyPDF2
-#from langchain import PromptTemplate, SagemakerEndpoint
-#from langchain.llms.sagemaker_endpoint import LLMContentHandler
+from langchain import PromptTemplate, SagemakerEndpoint
+from langchain.llms.sagemaker_endpoint import LLMContentHandler
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
