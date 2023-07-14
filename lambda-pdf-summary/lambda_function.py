@@ -12,6 +12,21 @@ s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
 s3_prefix = os.environ.get('s3_prefix')
 
+class ContentHandler(LLMContentHandler):
+    content_type = "application/json"
+    accepts = "application/json"
+
+    def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
+        #input_str = json.dumps({'inputs': prompt, **model_kwargs})
+        input_str = json.dumps({'inputs': prompt, 'parameters': model_kwargs})
+        return input_str.encode('utf-8')
+      
+    def transform_output(self, output: bytes) -> str:
+        response_json = json.loads(output.read().decode("utf-8"))
+        return response_json[0]["generated_text"]
+
+content_handler = ContentHandler()
+
 def get_summary_from_pdf(file_type, s3_file_name):
     summary = ''
     
@@ -27,6 +42,21 @@ def get_summary_from_pdf(file_type, s3_file_name):
         for page in reader.pages:
             raw_text.append(page.extract_text())
         contents = '\n'.join(raw_text)    
+
+        aws_region = boto3.Session().region_name
+        parameters = {
+            "max_length": 200
+        }        
+        content_handler = ContentHandler()
+
+        llm = SagemakerEndpoint(
+            endpoint_name = endpoint_name, 
+            region_name = aws_region, 
+            model_kwargs = parameters,
+            content_handler = content_handler
+        )
+        output = llm('Building a website can be done in 10 simple steps')
+        print(output)
 
         new_contents = str(contents[:4000]).replace("\n"," ") 
         print('new_contents: ', new_contents)
