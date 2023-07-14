@@ -181,6 +181,27 @@ else:
 
 ![noname](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/039ea686-dd2c-4dc6-8deb-730e7d191ee1)
 
+4) Question/Answering의 경우
+
+```text
+On a given week, the viewers for a TV channel were
+Monday: 6500 viewers
+Tuesday: 6400 viewers
+Wednesday: 6300 viewers
+
+
+Question: How many viewers can we expect on Friday?
+Answer: Based on the numbers given and without any more information, there is a daily decrease of 100 viewers. If we assume this trend will continue during the following days, we can expect 6200 viewers on the next day that would be Thursday, and therefore 6100 viewers on the next day that would be Friday.
+
+
+Question: How many viewers can we expect on Saturday? (Think Step-by-Step)
+Answer:
+```
+
+이때의 결과는 아래와 같습니다.
+
+<img width="885" alt="image" src="https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/d9baf58a-232d-437f-8d39-887f05324f29">
+
 
 ### 리소스 정리하기
 
