@@ -16,6 +16,7 @@ s3_bucket = os.environ.get('s3_bucket') # bucket name
 s3_prefix = os.environ.get('s3_prefix')
 endpoint_name = os.environ.get('endpoint')
 
+# initiate llm model based on langchain
 class ContentHandler(LLMContentHandler):
     content_type = "application/json"
     accepts = "application/json"
@@ -29,6 +30,19 @@ class ContentHandler(LLMContentHandler):
         return response_json[0]["generated_text"]
 
 content_handler = ContentHandler()
+
+aws_region = boto3.Session().region_name
+
+parameters = {
+    "max_new_tokens": 300,
+}        
+        
+llm = SagemakerEndpoint(
+    endpoint_name = endpoint_name, 
+    region_name = aws_region, 
+    model_kwargs = parameters,
+    content_handler = content_handler
+)
 
 def get_summary_from_pdf(file_type, s3_file_name):
     summary = ''
@@ -44,19 +58,6 @@ def get_summary_from_pdf(file_type, s3_file_name):
         for page in reader.pages:
             raw_text.append(page.extract_text())
         contents = '\n'.join(raw_text)    
-
-        aws_region = boto3.Session().region_name
-        parameters = {
-            "max_new_tokens": 300,
-        }        
-        content_handler = ContentHandler()
-
-        llm = SagemakerEndpoint(
-            endpoint_name = endpoint_name, 
-            region_name = aws_region, 
-            model_kwargs = parameters,
-            content_handler = content_handler
-        )
 
         new_contents = str(contents).replace("\n"," ") 
         print('length: ', len(new_contents))
