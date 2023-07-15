@@ -41,13 +41,11 @@ def lambda_handler(event, context):
             "top_p": 0.9,
             "top_k":1,
             "stop": ["<|endoftext|>", "</s>"]
-
     }
         
     endpoint_name = os.environ.get('endpoint')
-    response = query_endpoint(payload, endpoint_name)
 
-    generated_text = response['body']
+    generated_text = query_endpoint(payload, endpoint_name)
 
     elapsed_time = int(time.time()) - start
     print("total run time(sec): ", elapsed_time)
