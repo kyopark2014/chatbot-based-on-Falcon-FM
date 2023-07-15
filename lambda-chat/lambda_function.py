@@ -5,8 +5,6 @@ import time
 from multiprocessing import Process
 from io import BytesIO
 
-endpoint_name = os.environ.get('endpoint')
-
 def query_endpoint(payload, endpoint_name):
     client = boto3.client('runtime.sagemaker')
     response = client.invoke_endpoint(
@@ -45,6 +43,7 @@ def lambda_handler(event, context):
         "stop": ["<|endoftext|>", "</s>"]
     }
 
+    endpoint_name = os.environ.get('endpoint')
     generated_text = query_endpoint(payload, endpoint_name)
 
     elapsed_time = int(time.time()) - start
