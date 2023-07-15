@@ -35,8 +35,8 @@ aws_region = boto3.Session().region_name
 
 parameters = {
     "max_new_tokens": 512,
-    "return_full_text": True,
-    "do_sample": True,
+    "return_full_text": False,
+    "do_sample": False,
     "temperature": 0.5,
     "repetition_penalty": 1.03,
     "top_p": 0.9,
