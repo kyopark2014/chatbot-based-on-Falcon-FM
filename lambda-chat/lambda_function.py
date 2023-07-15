@@ -13,29 +13,15 @@ def query_endpoint(payload, endpoint_name):
         Body=json.dumps(payload).encode('utf-8'))                
     print('response:', response)
         
-    statusCode = response['ResponseMetadata']['HTTPStatusCode']        
-    if(statusCode==200):
-        response_payload = json.loads(response['Body'].read())
-        print('response_payload:', response_payload)
+    response_payload = json.loads(response['Body'].read())
+    print('response_payload:', response_payload)
 
-        outputText = ""
-        print('len:', len(response_payload))
-        if len(response_payload) == 1:
-            outputText = response_payload[0]['generated_text']
-        else:
-            for resp in response_payload:
-                outputText = outputText + resp['generated_text'] + '\n'
-                
-        return {
-            'statusCode': statusCode,
-            'body': outputText
-        }
-            
-    else:
-        return {
-            'statusCode': statusCode,
-            'body': json.dumps(response)
-        }
+    generated_text = response_payload[0]['generated_text']
+
+    if generated_text == '':
+        generated_text = 'Fail to read the document. Try agan...'
+
+    return generated_text
     
 def lambda_handler(event, context):
     print(event)
@@ -47,29 +33,34 @@ def lambda_handler(event, context):
     
     payload = {
         "inputs": text,
+        """"
         "parameters":{
             "max_new_tokens": 200,
             #"return_full_text": False,
             #"do_sample": True,
             #"top_k":10
         }
+        """
+        "max_new_tokens": 512,
+            "return_full_text": True,
+            "do_sample": True,
+            "temperature": 0.5,
+            "repetition_penalty": 1.03,
+            "top_p": 0.9,
+            "top_k":1,
+            "stop": ["<|endoftext|>", "</s>"]
+
     }
         
     endpoint_name = os.environ.get('endpoint')
     response = query_endpoint(payload, endpoint_name)
 
     generated_text = response['body']
-    statusCode = response['statusCode']
-
-    newline, bold, unbold = '\n', '\033[1m', '\033[0m' 
-    print (
-        f"Input Text: {payload['inputs']}{newline}"
-        f"Generated Text: {bold}{generated_text}{unbold}{newline}")
 
     elapsed_time = int(time.time()) - start
     print("total run time(sec): ", elapsed_time)
 
     return {
-        'statusCode': statusCode,
+        'statusCode': 200,
         'msg': generated_text,
     }        
