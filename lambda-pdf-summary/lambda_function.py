@@ -87,8 +87,11 @@ def get_summary_from_pdf(file_type, s3_file_name):
         PROMPT = PromptTemplate(template=prompt_template, input_variables=["text"])
         chain = load_summarize_chain(llm, chain_type="stuff", prompt=PROMPT)
         summary = chain.run(docs)
-        print('summary: ', summary)
-            
+                    
+    if summary == '':  # error notification
+            summary = 'Fail to summarize the document. Try agan...'
+    print('summary: ', summary)
+
     return summary    
         
 def lambda_handler(event, context):
@@ -101,15 +104,7 @@ def lambda_handler(event, context):
     
     summary = get_summary_from_pdf('pdf', object)
 
-    if(summary != ''):
-        return {
-            'statusCode': 200,
-            'msg': summary,
-        }                                       
-    else: 
-        return {
-            'statusCode': 200,  # error notification
-            'msg': "Failed to get summary, please try again",
-        }
-    
-    
+    return {
+        'statusCode': 200,
+        'msg': summary,
+    }                                       
