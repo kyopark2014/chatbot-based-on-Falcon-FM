@@ -33,14 +33,6 @@ def lambda_handler(event, context):
     
     payload = {
         "inputs": text,
-        """"
-        "parameters":{
-            "max_new_tokens": 200,
-            #"return_full_text": False,
-            #"do_sample": True,
-            #"top_k":10
-        }
-        """
         "max_new_tokens": 512,
             "return_full_text": True,
             "do_sample": True,
