@@ -92,7 +92,7 @@ def get_summary_from_pdf(file_type, s3_file_name):
             summary = 'Fail to summarize the document. Try agan...'
     print('summary: ', summary)
 
-    return summary    
+    return summary[1:len(summary)-1]
         
 def lambda_handler(event, context):
     print(event)
@@ -104,6 +104,9 @@ def lambda_handler(event, context):
     
     summary = get_summary_from_pdf('pdf', object)
 
+    elapsed_time = int(time.time()) - start
+    print("total run time(sec): ", elapsed_time)
+    
     return {
         'statusCode': 200,
         'msg': summary,

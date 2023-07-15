@@ -21,7 +21,7 @@ def query_endpoint(payload, endpoint_name):
     if generated_text == '':
         generated_text = 'Fail to read the document. Try agan...'
 
-    return generated_text
+    return generated_text[1:len(generated_text)-1]
     
 def lambda_handler(event, context):
     print(event)
@@ -33,17 +33,20 @@ def lambda_handler(event, context):
     
     payload = {
         "inputs": text,
-        "max_new_tokens": 512,
-        "return_full_text": False,
-        "do_sample": False,
-        "temperature": 0.5,
-        "repetition_penalty": 1.03,
-        "top_p": 0.9,
-        "top_k":1,
-        "stop": ["<|endoftext|>", "</s>"]
+        "parameters":{
+            "max_new_tokens": 512,
+            "return_full_text": False,
+            "do_sample": False,
+            "temperature": 0.5,
+            "repetition_penalty": 1.03,
+            "top_p": 0.9,
+            "top_k":1,
+            "stop": ["<|endoftext|>", "</s>"]
+        }
     }
-
+        
     endpoint_name = os.environ.get('endpoint')
+
     generated_text = query_endpoint(payload, endpoint_name)
 
     elapsed_time = int(time.time()) - start
