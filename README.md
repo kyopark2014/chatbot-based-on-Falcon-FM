@@ -33,34 +33,30 @@ text = event['text']
 
 payload = {
     "inputs": text,
-    "parameters":{
-        "max_new_tokens": 200,
+    "parameters": {
+        "max_new_tokens": 512,
+        "return_full_text": False,
+        "do_sample": False,
+        "temperature": 0.5,
+        "repetition_penalty": 1.03,
+        "top_p": 0.9,
+        "top_k": 1,
+        "stop": ["<|endoftext|>", "</s>"]
     }
 }
 ```
 
-아래와 같이 boto3를 이용해 endpoint로 payload를 전달합니다. 이때 출력의 statusCode가 200일때 body의 generated_text를 추출합니다.
+아래와 같이 boto3를 이용해 endpoint로 payload를 전달하고 응답에서 generated_text를 추출합니다.
 
 ```python
 client = boto3.client('runtime.sagemaker')
-
-endpoint_name = os.environ.get('endpoint')
 response = client.invoke_endpoint(
     EndpointName=endpoint_name, 
     ContentType='application/json', 
     Body=json.dumps(payload).encode('utf-8'))                
-        
-statusCode = response['ResponseMetadata']['HTTPStatusCode']        
-
-outputText = ""        
-if(statusCode==200):
-    response_payload = json.loads(response['Body'].read())
-
-    if len(response_payload) == 1:
-        outputText = response_payload[0]['generated_text']
-    else:
-        for resp in response_payload:
-            outputText = outputText + resp['generated_text'] + '\n'
+    
+response_payload = json.loads(response['Body'].read())
+generated_text = response_payload[0]['generated_text']
 ```
 
 전달된 payload에 대한 SageMaker Endpoint의 Response 예는 아래와 같습니다.
