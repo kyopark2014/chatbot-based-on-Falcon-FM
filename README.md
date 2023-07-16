@@ -249,9 +249,9 @@ engineer
 
 6) Code generation
 
-"Generate and return the code for each module using the programming language and programming framework requested in. Python Streamlit code for a banking app using DynamoDB"로 입력시 관련 코드를 생성할 수 있습니다.
+"Generate and return the code for each module using the programming language and programming framework requested in. Modify this code and return markdowns for each module using the suggestions in: Python Streamlit code for a banking app using DynamoDB"로 입력시 관련 코드를 생성할 수 있습니다.
 
-![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/8cd825cc-207d-490d-b68f-910a98286ba4)
+![image](https://github.com/kyopark2014/chatbot-based-on-Falcon-FM/assets/52392004/fe52ffe2-5fb3-4aa4-be43-b8a219372b9f)
 
 
 
