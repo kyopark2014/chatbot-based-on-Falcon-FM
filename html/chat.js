@@ -175,73 +175,68 @@ attachFile.addEventListener('click', function(){
             var url_file = $(this).val();
             var ext = url_file.substring(url_file.lastIndexOf('.') + 1).toLowerCase();
             var filename = url_file.substring(url_file.lastIndexOf('\\') + 1).toLowerCase();
-
             console.log('url: ' + url_file);
             console.log('filename: ' + filename);
             console.log('ext: ' + ext);
 
-            if(ext == 'pdf') {
-                contentType = 'application/pdf'           
+            if(ext != pdf) {
+                addSentMessageForSummary("please select a pdf file.");
             }
-            else if(ext == 'txt') {
-                contentType = 'text/plain'
-            }
-            else if(ext == 'csv') {
-                contentType = 'text/csv'
-            }
+            else {                      
+                addSentMessageForSummary("uploading the selected pdf in order to summerize...");
 
-            addSentMessageForSummary("uploading the selected pdf in order to summerize...");
+                contentType = 'application/pdf' 
+                const uri = "upload";
+                const xhr = new XMLHttpRequest();
+            
+                xhr.open("POST", uri, true);
+                xhr.onreadystatechange = () => {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        response = JSON.parse(xhr.responseText);
+                        console.log("response: " + JSON.stringify(response));
+                        
+                        // upload the file
+                        const body = JSON.parse(response.body);
+                        console.log('body: ', body);
 
-            const uri = "upload";
-            const xhr = new XMLHttpRequest();
-        
-            xhr.open("POST", uri, true);
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    response = JSON.parse(xhr.responseText);
-                    console.log("response: " + JSON.stringify(response));
-                    
-                    // upload the file
-                    const body = JSON.parse(response.body);
-                    console.log('body: ', body);
+                        const uploadURL = body.UploadURL;                    
+                        console.log("UploadURL: ", uploadURL);
 
-                    const uploadURL = body.UploadURL;                    
-                    console.log("UploadURL: ", uploadURL);
+                        var xmlHttp = new XMLHttpRequest();
+                        xmlHttp.open("PUT", uploadURL, true);       
 
-                    var xmlHttp = new XMLHttpRequest();
-                    xmlHttp.open("PUT", uploadURL, true);       
+                        let formData = new FormData();
+                        formData.append("attachFile" , input.files[0]);
+                        console.log('uploading file info: ', formData.get("attachFile"));
 
-                    let formData = new FormData();
-                    formData.append("attachFile" , input.files[0]);
-                    console.log('uploading file info: ', formData.get("attachFile"));
-
-                    xmlHttp.onreadystatechange = function() {
-                        if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200 ) {
-                            console.log(xmlHttp.responseText);
-                                           
-                            // summary for the upload file
-                            sendRequestForSummary(filename);
-                        }
-                        else if(xmlHttp.status != 200) {
-                            console.log('status' + xmlHttp.status);
-                            alert("Try again! The request was failed.");
-                        }
-                    };
-        
-                    xmlHttp.send(formData); 
-                    console.log(xmlHttp.responseText);
+                        xmlHttp.onreadystatechange = function() {
+                            if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200 ) {
+                                console.log(xmlHttp.responseText);
+                                            
+                                // summary for the upload file
+                                sendRequestForSummary(filename);
+                            }
+                            else if(xmlHttp.status != 200) {
+                                console.log('status' + xmlHttp.status);
+                                alert("Try again! The request was failed.");
+                            }
+                        };
+            
+                        xmlHttp.send(formData); 
+                        console.log(xmlHttp.responseText);
+                    }
+                };
+            
+                var requestObj = {
+                    "filename": filename,
+                    "contentType": contentType,
                 }
-            };
-        
-            var requestObj = {
-                "filename": filename,
-                "contentType": contentType,
-            }
-            console.log("request: " + JSON.stringify(requestObj));
-        
-            var blob = new Blob([JSON.stringify(requestObj)], {type: 'application/json'});
-        
-            xhr.send(blob);       
+                console.log("request: " + JSON.stringify(requestObj));
+            
+                var blob = new Blob([JSON.stringify(requestObj)], {type: 'application/json'});
+            
+                xhr.send(blob);
+            }                   
         });
     });
        
