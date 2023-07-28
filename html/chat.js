@@ -65,7 +65,7 @@ index = 0;
 
 addNotifyMessage("start chat with LLM");
 
-addReceivedMessage("원하는 질문을 입력하세요. 아래의 파일 버튼을 선택해 PDF 문서를 올리면 요약(Summerization)을 할수 있습니다.")
+addReceivedMessage("Welcome! Enter your question on the prompt.")
 
 // Listeners
 message.addEventListener('keyup', function(e){
@@ -196,7 +196,7 @@ attachFile.addEventListener('click', function(){
             const uri = "upload";
             const xhr = new XMLHttpRequest();
         
-            xhr.open("POST", uri, true);
+            xhr.open("upload", uri, true);
             xhr.onreadystatechange = () => {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     response = JSON.parse(xhr.responseText);
@@ -277,7 +277,7 @@ function sendRequest(text) {
 }
 
 function sendRequestForSummary(object) {
-    const uri = "chat";
+    const uri = "pdf";
     const xhr = new XMLHttpRequest();
 
     xhr.open("POST", uri, true);
