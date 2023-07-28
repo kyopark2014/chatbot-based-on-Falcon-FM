@@ -195,7 +195,7 @@ attachFile.addEventListener('click', function(){
             const uri = "upload";
             const xhr = new XMLHttpRequest();
         
-            xhr.open("upload", uri, true);
+            xhr.open("POST", uri, true);
             xhr.onreadystatechange = () => {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     response = JSON.parse(xhr.responseText);
