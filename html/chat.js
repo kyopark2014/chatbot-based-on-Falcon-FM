@@ -42,6 +42,7 @@ var maxMsgItems = 50;
 var msgHistory = new HashMap();
 var callee = "John";
 var index=0;
+var userId = uuidv4();
 
 for (i=0;i<maxMsgItems;i++) {
     msglist.push(document.getElementById('msgLog'+i));
@@ -62,7 +63,9 @@ calleeId.textContent = "AWS";
 
 index = 0;
 
-addNotifyMessage("start the interractive chat");
+addNotifyMessage("start chat with LLM");
+
+addReceivedMessage("원하는 질문을 입력하세요. 아래의 파일 버튼을 선택해 PDF 문서를 올리면 요약(Summerization)을 할수 있습니다.")
 
 // Listeners
 message.addEventListener('keyup', function(e){
@@ -120,7 +123,7 @@ function addSentMessage(text) {
     sendRequest(text);    
 }       
 
-function addSentMessagePDF(text) {  
+function addSentMessageForSummary(text) {  
     console.log("sent message: "+text);
 
     var date = new Date();
@@ -129,6 +132,8 @@ function addSentMessagePDF(text) {
 
     msglist[index].innerHTML = 
         `<div class="chat-sender chat-sender--right"><h1>${timestr}</h1>${text}&nbsp;<h2 id="status${index}"></h2></div>`;   
+
+    chatPanel.scrollTop = chatPanel.scrollHeight;  // scroll needs to move bottom
 }  
 
 function addReceivedMessage(msg) {
@@ -170,46 +175,74 @@ attachFile.addEventListener('click', function(){
             var input = this;
             var url_file = $(this).val();
             var ext = url_file.substring(url_file.lastIndexOf('.') + 1).toLowerCase();
+            var filename = url_file.substring(url_file.lastIndexOf('\\') + 1).toLowerCase();
 
             console.log('url: ' + url_file);
+            console.log('filename: ' + filename);
             console.log('ext: ' + ext);
 
             if(ext == 'pdf') {
-                const url = 'upload';
-                let formData = new FormData();
-                formData.append("attachFile" , input.files[0]);
-                
-                var xmlHttp = new XMLHttpRequest();
-                xmlHttp.open("POST", url, true);                 
-                xmlHttp.setRequestHeader('Content-Type', 'application/pdf');
-                //xmlHttp.setRequestHeader('Content-Disposition', 'form-data; name="'+name+'"; filename="'+filename+'"');
-
-                addSentMessagePDF("uploading the selected pdf in order to summerize...");
-                chatPanel.scrollTop = chatPanel.scrollHeight;  // scroll needs to move bottom
-                
-                xmlHttp.onreadystatechange = function() {
-                    if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200 ) {
-                        console.log(xmlHttp.responseText);
-
-                        response = JSON.parse(xmlHttp.responseText);
-                        console.log('upload file nmae: ' + response.Key);
-
-                        sendRequestPDF(response.Key);
-                    }
-                    else if(xmlHttp.status != 200) {
-                        console.log('status' + xmlHttp.status);
-                        alert("Try again! The request was failed. The size of PDF file should be less than 5MB");
-                    }
-                };
-                
-                xmlHttp.send(formData); 
-                console.log(xmlHttp.responseText);  
+                contentType = 'application/pdf'           
             }
-            else {
-                
+            else if(ext == 'txt') {
+                contentType = 'text/plain'
             }
-            
-                       
+            else if(ext == 'csv') {
+                contentType = 'text/csv'
+            }
+
+            addSentMessageForSummary("uploading the selected pdf in order to summerize...");
+
+            const uri = "upload";
+            const xhr = new XMLHttpRequest();
+        
+            xhr.open("POST", uri, true);
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    response = JSON.parse(xhr.responseText);
+                    console.log("response: " + JSON.stringify(response));
+                    
+                    // upload the file
+                    const body = JSON.parse(response.body);
+                    console.log('body: ', body);
+
+                    const uploadURL = body.UploadURL;                    
+                    console.log("UploadURL: ", uploadURL);
+
+                    var xmlHttp = new XMLHttpRequest();
+                    xmlHttp.open("PUT", uploadURL, true);       
+
+                    let formData = new FormData();
+                    formData.append("attachFile" , input.files[0]);
+                    console.log('uploading file info: ', formData.get("attachFile"));
+
+                    xmlHttp.onreadystatechange = function() {
+                        if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200 ) {
+                            console.log(xmlHttp.responseText);
+                                           
+                            // summary for the upload file
+                            sendRequestForSummary(filename);
+                        }
+                        else if(xmlHttp.status != 200) {
+                            console.log('status' + xmlHttp.status);
+                            alert("Try again! The request was failed.");
+                        }
+                    };
+        
+                    xmlHttp.send(formData); 
+                    console.log(xmlHttp.responseText);
+                }
+            };
+        
+            var requestObj = {
+                "filename": filename,
+                "contentType": contentType,
+            }
+            console.log("request: " + JSON.stringify(requestObj));
+        
+            var blob = new Blob([JSON.stringify(requestObj)], {type: 'application/json'});
+        
+            xhr.send(blob);       
         });
     });
        
@@ -230,7 +263,12 @@ function sendRequest(text) {
         }
     };
 
-    var requestObj = {"text":text}
+    var requestObj = {
+        "user-id": userId,
+        "request-id": uuidv4(),
+        "type": "text",
+        "body":text
+    }
     console.log("request: " + JSON.stringify(requestObj));
 
     var blob = new Blob([JSON.stringify(requestObj)], {type: 'application/json'});
@@ -238,8 +276,8 @@ function sendRequest(text) {
     xhr.send(blob);            
 }
 
-function sendRequestPDF(object) {
-    const uri = "pdf";
+function sendRequestForSummary(object) {
+    const uri = "chat";
     const xhr = new XMLHttpRequest();
 
     xhr.open("POST", uri, true);
@@ -252,10 +290,16 @@ function sendRequestPDF(object) {
         }
     };
 
-    var requestObj = {"object":object}
+    var requestObj = {
+        "user-id": userId,
+        "request-id": uuidv4(),
+        "type": "document",
+        "body": object
+    }
     console.log("request: " + JSON.stringify(requestObj));
 
     var blob = new Blob([JSON.stringify(requestObj)], {type: 'application/json'});
 
     xhr.send(blob);            
 }
+
