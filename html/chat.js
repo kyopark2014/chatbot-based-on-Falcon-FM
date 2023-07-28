@@ -179,7 +179,7 @@ attachFile.addEventListener('click', function(){
             console.log('filename: ' + filename);
             console.log('ext: ' + ext);
 
-            if(ext != pdf) {
+            if(ext != 'pdf') {
                 addSentMessageForSummary("please select a pdf file.");
             }
             else {                      
